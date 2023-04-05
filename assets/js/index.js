@@ -33,6 +33,9 @@
       closeSearch: document.querySelector(".close-search"),
       triggerSearch: document.querySelector("#trigger-search"),
       searchModal: document.querySelector("#search-modal"),
+      triggerImagesLightBox: document.querySelectorAll(".trigger-lightbox"),
+      closeLightBox: document.querySelector(".close-lightbox"),
+      lightboxModal: document.querySelector("#lightbox"),
     };
 
     const disableScroll = () => {
@@ -61,6 +64,26 @@
         });
       }, 200);
     };
+
+    if (domElements.triggerImagesLightBox) {
+      domElements.triggerImagesLightBox.forEach((ti) => {
+        ti.addEventListener("click", () => {
+          domElements.lightboxModal.classList.add("opened");
+          disableScroll();
+        });
+      });
+    }
+
+    if (domElements.closeLightBox) {
+      if (domElements.lightboxModal) {
+        domElements.closeLightBox.addEventListener("click", () => {
+          if (domElements.lightboxModal.classList.contains("opened")) {
+            domElements.lightboxModal.classList.remove("opened");
+            enableScroll();
+          }
+        });
+      }
+    }
 
     if (domElements.triggerSearch) {
       if (domElements.searchModal) {

@@ -595,7 +595,7 @@ function woocommerce_ajax_filter_products()
                     'stock_status' => 'outofstock'
                 )
             );
-            var_dump($new_args);
+            //var_dump($new_args);
         }
     }
 

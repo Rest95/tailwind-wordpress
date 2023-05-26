@@ -290,7 +290,7 @@
               currentSelected.innerHTML = "define";
               addToCart.parentNode.querySelector(
                 "input[name='variation_id']"
-              ).value = "";
+              ).value = "0";
               addToCart.classList.add("disabled");
               addToCart.classList.add("wc-variation-selection-needed");
             }
@@ -373,7 +373,7 @@
             cartContentUpdated.children[0].children[1].children[0].innerHTML;
 
           if (data.variation_id) {
-            document.querySelector("input[name='variation_id']").value = "";
+            document.querySelector("input[name='variation_id']").value = "0";
             addTocartButton.classList.add("disabled");
             addTocartButton.classList.add("wc-variation-selection-needed");
           }

@@ -19,8 +19,8 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-$tracking_code = get_post_meta($order->id, '_wlb_tracking_code', true);
-$shipping_company = get_post_meta($order->id, '_wlb_shipping_company', true);
+$tracking_code = get_post_meta($order->get_id(), '_wlb_tracking_code', true);
+$shipping_company = get_post_meta($order->get_id(), '_wlb_shipping_company', true);
 
 /*
  * @hooked WC_Emails::email_header() Output the email header

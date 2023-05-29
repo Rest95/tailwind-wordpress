@@ -207,10 +207,10 @@ if (!function_exists('theme_woocommerce_floating_cart')) {
                         $product_thumbnail = wp_get_attachment_image_src($post_thumbnail_id, $size = 'shop-feature');
                         $product_thumbnail_alt = get_post_meta($post_thumbnail_id, '_wp_attachment_image_alt', true);
                         $percentage = 0;
-                        $show_preco = $product->regular_price;
-                        if ($product->sale_price) {
-                            $percentage = round(((floatval($product->regular_price) - floatval($product->sale_price)) / floatval($product->regular_price)) * 100);
-                            $show_preco = $product->sale_price;
+                        $show_preco = $product->get_regular_price();
+                        if ($product->get_sale_price()) {
+                            $percentage = round(((floatval($product->get_regular_price()) - floatval($product->get_sale_price())) / floatval($product->get_regular_price())) * 100);
+                            $show_preco = $product->get_sale_price();
                         }
                         ?>
                         <div class="cart-product grid grid-cols-[auto_124px_1fr] border-b-[1px] py-4">
@@ -595,7 +595,7 @@ function woocommerce_ajax_filter_products()
                     'stock_status' => 'outofstock'
                 )
             );
-            var_dump($new_args);
+            //var_dump($new_args);
         }
     }
 
@@ -1161,8 +1161,8 @@ function wlb_display_order_data_in_admin($order)
         </h3>
         <div class="address">
             <?php
-            echo '<p><strong>' . __('Shipping Company') . ':</strong>' . get_post_meta($order->id, '_wlb_shipping_company', true) . '</p>';
-            echo '<p><strong>' . __('Tracking Code') . ':</strong>' . get_post_meta($order->id, '_wlb_tracking_code', true) . '</p>';
+            echo '<p><strong>' . __('Shipping Company') . ':</strong>' . get_post_meta($order->get_id(), '_wlb_shipping_company', true) . '</p>';
+            echo '<p><strong>' . __('Tracking Code') . ':</strong>' . get_post_meta($order->get_id(), '_wlb_tracking_code', true) . '</p>';
             ?>
         </div>
         <div class="edit_address">

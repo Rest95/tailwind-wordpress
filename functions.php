@@ -8,7 +8,7 @@ require_once ABSPATH . 'wp-admin/includes/image.php';
 require_once ABSPATH . "wp-config.php";
 require_once ABSPATH . "wp-includes/wp-db.php";
 add_filter('wpgs_show_featured_image_in_gallery', '__return_false', 20);
-
+add_filter('woocommerce_nif_field_required', '__return_false');
 
 
 function get_products()
@@ -1011,29 +1011,32 @@ function wlb_login_logo()
 add_action('login_enqueue_scripts', 'wlb_login_logo');
 //fim de copia
 
-add_action('woocommerce_cart_calculate_fees', function () {
-    if (is_admin()) {
-        return;
-    }
+add_action(
+    'woocommerce_cart_calculate_fees', function () {
+        if (is_admin()) {
+            return;
+        }
 
-    $payment_method = WC()->session->get('chosen_payment_method');
+        $payment_method = WC()->session->get('chosen_payment_method');
 
 
-    if ($payment_method === 'cod') {
-        $amount = 3; // How much the fee should be
-        $tax = 0; // empty value equals to Standard tax rate
-        $title = 'Pagamento na entrega';
+        if ($payment_method === 'cod') {
+            $amount = 3; // How much the fee should be
+            $tax = 0; // empty value equals to Standard tax rate
+            $title = 'Pagamento na entrega';
 
-        WC()->cart->add_fee($title, floatval($amount), false, $tax);
-    }
-}, 10, 0);
+            WC()->cart->add_fee($title, floatval($amount), false, $tax);
+        }
+    }, 10, 0
+);
 
 /**
  * By default WooCommerce doesn't update checkout when changing payment
  * method so we need to trigger update here
  */
-add_action('wp_head', function () {
-    ?>
+add_action(
+    'wp_head', function () {
+        ?>
     <script type="text/javascript">
         jQuery(document).ready(function ($) {
             /**
@@ -1044,22 +1047,24 @@ add_action('wp_head', function () {
             });
         });
     </script>
-<?php
-}, 10, 0);
+        <?php
+    }, 10, 0
+);
 
-add_filter( 'rest_authentication_errors', function( $result ) {
+add_filter(
+    'rest_authentication_errors', function ( $result ) {
         // If a previous authentication check was applied,
         // pass that result along without modification.
-        if ( true === $result || is_wp_error( $result ) ) {
+        if (true === $result || is_wp_error($result) ) {
             return $result;
         }
      
         // No authentication has been performed yet.
         // Return an error if user is not logged in.
-        if ( ! is_user_logged_in() ) {
+        if (! is_user_logged_in() ) {
             return new WP_Error(
                 'rest_not_logged_in',
-                __( 'You are not currently logged in.' ),
+                __('You are not currently logged in.'),
                 array( 'status' => 401 )
             );
         }
@@ -1067,5 +1072,5 @@ add_filter( 'rest_authentication_errors', function( $result ) {
         // Our custom authentication check should have no effect
         // on logged-in requests
         return $result;
-    });
-
+    }
+);

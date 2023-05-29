@@ -45,7 +45,7 @@ $wrapper_classes = apply_filters(
       <?php foreach ($gallery as $image) {
         $url = wp_get_attachment_image_url($image, 'full');
         ?>
-        <div class="swiper-slide woocommerce-product-gallery__trigger">
+        <div class="swiper-slide woocommerce-product-gallery__trigger trigger-lightbox">
           <img src="<?php echo $url ?>" alt="<?php echo $product->get_name() ?>" width="400" />
         </div>
       <?php } ?>
@@ -74,33 +74,33 @@ $wrapper_classes = apply_filters(
       <div class="swiper-pagination bottom-0"></div>
     </div>
   </div>
-  <div class="flex-viewport" style="display: none;">
-    <figure class="woocommerce-product-gallery__wrapper"
-      style="width: 400%; transition-duration: 0s; transform: translate3d(0px, 0px, 0px);">
-      <?php foreach ($gallery as $key => $image) {
-        $url = wp_get_attachment_image_url($image, 'full');
-        ?>
-        <div data-thumb="<?php echo $url ?>" data-thumb-alt="<?php echo $product->get_name() ?>"
-          class="woocommerce-product-gallery__image flex-active-slide" style="">
-          <a href="<?php echo $url ?>">
-            <img width="300" height="427" src="<?php echo $url ?>" class="" alt="" decoding="async" loading="lazy"
-              title="<?php echo $product->get_name() . ' - ' . ($key + 1) ?>"
-              data-caption="<?php echo $product->get_name() ?>" data-src="<?php echo $url ?>"
-              data-large_image="<?php echo $url ?>" data-large_image_width="1800" data-large_image_height="2560"
-              draggable="false">
-          </a>
+  <div id="lightbox">
+    <div class="fixed top-0 left-0 w-full h-screen bg-white z-[99999]">
+      <div class="w-full h-full flex justify-center items-center">
+        <div class="p-4 md:p-8  absolute top-4 right-4 z-30">
+          <button class="self-start flex-none text-black text-xl lg:text-3xl close-lightbox ">
+            <?php echo $icons->get_icon('Cross') ?>
+          </button>
         </div>
-        <div class="swiper-slide woocommerce-product-gallery__trigger">
-          <img src="<?php echo $url ?>" alt="<?php echo $product->get_name() ?>" />
+        <div class="swiper product-images w-full px-8">
+          <div class="swiper-wrapper ">
+            <?php foreach ($gallery as $key => $image) {
+              $url = wp_get_attachment_image_url($image, 'full');
+              ?>
+              <div class="swiper-slide min-h-[90vh]">
+                <img src="<?= $url ?>" class="img-fit" alt="banner <?= $key ?>" />
+              </div>
+            <?php } ?>
+          </div>
         </div>
-      <?php } ?>
-    </figure>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
   var swiper = new Swiper(".product-images", {
-    loop:  <?php echo count($gallery) > 1 ? 'true' : 'false' ?>,
+    loop: <?php echo count($gallery) > 1 ? 'true' : 'false' ?>,
     navigation: {
       nextEl: ".swiper-button-next",
       prevEl: ".swiper-button-prev",
@@ -108,6 +108,15 @@ $wrapper_classes = apply_filters(
     pagination: {
       el: '.swiper-pagination',
       clickable: true,
+    },
+  });
+
+  var swiper_images = new Swiper(".product-images", {
+    loop: <?= count($gallery) > 0 ? "true" : "false" ?>,
+    spaceBetween: 0,
+    navigation: {
+      nextEl: ".swiper-button-next",
+      prevEl: ".swiper-button-prev",
     },
   });
 </script>

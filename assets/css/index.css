@@ -1,6 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.grecaptcha-badge {
+  visibility: hidden !important;
+}
+
 .pswp__img--placeholder--blank {
   background-color: #fff !important;
 }
@@ -56,6 +61,9 @@
 }
 .img-fill {
   @apply object-cover object-center absolute inset-0 p-0 border-none m-auto block w-0 h-0 min-w-full max-w-full min-h-full max-h-full;
+}
+.img-fit {
+  @apply object-contain object-center absolute inset-0 p-0 border-none m-auto block w-0 h-0 min-w-full max-w-full min-h-full max-h-full;
 }
 .btn {
   @apply uppercase px-8 py-3 font-roboto text-center gap-2 transition-all duration-300 inline-flex;
@@ -332,7 +340,6 @@ input[type="number"] {
 .form-submit-box input {
   border-radius: 0px !important;
 }
-
 .wpcf7 form.invalid .wpcf7-response-output,
 .wpcf7 form.unaccepted .wpcf7-response-output,
 .wpcf7 form.payment-required .wpcf7-response-output {
@@ -344,4 +351,11 @@ input[type="number"] {
     rgba(0, 181, 216, 0) 59%,
     rgba(0, 0, 0, 1) 100%
   );
+}
+
+#lightbox {
+  @apply transition-all scale-50 duration-200 opacity-0 invisible pointer-events-none fixed z-[9999] w-screen h-screen top-0 left-0;
+}
+#lightbox.opened {
+  @apply opacity-100 visible pointer-events-auto scale-100;
 }

@@ -35,6 +35,10 @@ if ($product->is_type('simple')) { //if simple product
 	$percentage = apply_filters('get_variable_sale_percentage', $product);
 }
 
+$pre_venda_ativo = get_field('pre_venda_ativo', $product->get_id());
+$pre_venda_mensagem = get_field('pre_venda_mensagem', $product->get_id());
+
+
 if ($product->is_in_stock()): ?>
 
 	<?php do_action('woocommerce_before_add_to_cart_form'); ?>
@@ -69,7 +73,7 @@ if ($product->is_in_stock()): ?>
 					<?php if ($percentage) { ?>
 						<div>
 							<span class="bg-amarelo text-white rounded-sm text-sm px-1 py-px sm:px-2 sm:py-1 font-roboto">
-								<?='-' . $percentage ?>%
+								<?= '-' . $percentage ?>%
 							</span>
 						</div>
 					<?php } ?>
@@ -84,6 +88,17 @@ if ($product->is_in_stock()): ?>
 
 		<?php do_action('woocommerce_after_add_to_cart_button'); ?>
 	</form>
+	<?php if ($pre_venda_ativo): ?>
+		<div class="uppercase font-roboto text-xs text-amarelo text-center py-4">
+			<?= $pre_venda_mensagem ?>
+		</div>
+
+	<?php endif; ?>
+	<?php if ($percentage && $percentage > 0): ?>
+		<div class="uppercase font-roboto text-xs text-amarelo text-center py-4">
+			Promoções de 20% a 50%, campanha válida de 1 de janeiro a 30 de junho 2023.
+		</div>
+	<?php endif; ?>
 
 	<?php do_action('woocommerce_after_add_to_cart_form'); ?>
 

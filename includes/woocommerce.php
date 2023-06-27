@@ -358,33 +358,33 @@ function woocommerce_ajax_remove_from_cart_confirmation()
         <div class="bg-white max-w-md w-full p-4  opacity-0 transition-all translate-y-[10px] z-[51] font-roboto">
             <div class="flex justify-end mb-4">
                 <div class="modal-remove-product-close cursor-pointer ">
-                    <?php echo $icons->get_icon('GrClose'); ?>
-                </div>
-            </div>
-            <div>
-                <p class="mb-4 tracking-wide text-lg">
-                    <?php echo _e("Pretende eliminar", "theme-tailwind") ?> <b>
-                        <?php echo $product->get_name() ?>
-                    </b>
-                    <?php echo _e("do carrinho de compras?", "theme-tailwind") ?>
-                </p>
-                <span class="text-xs text-[#8d929b] tracking-wide">
-                    <?php echo _e("Após eliminar este produto, para o voltar a ter no carrinho, terá de o adicionar novamente.", "theme-tailwind") ?>
-                </span>
-            </div>
-            <div class="flex space-x-4 justify-end mt-8">
-                <button class="btn btn-primary">
-                    <?php
-                    echo _e("Cancelar", "theme-tailwind") ?>
-                </button>
-                <button class="btn btn-outline">
-                    <?php echo _e("Eliminar", "theme-tailwind") ?>
-                </button>
+                <?php echo $icons->get_icon('GrClose'); ?>
             </div>
         </div>
+        <div>
+            <p class="mb-4 tracking-wide text-lg">
+                <?php echo _e("Pretende eliminar", "theme-tailwind") ?> <b>
+                    <?php echo $product->get_name() ?>
+                </b>
+                <?php echo _e("do carrinho de compras?", "theme-tailwind") ?>
+            </p>
+            <span class="text-xs text-[#8d929b] tracking-wide">
+                <?php echo _e("Após eliminar este produto, para o voltar a ter no carrinho, terá de o adicionar novamente.", "theme-tailwind") ?>
+            </span>
+        </div>
+        <div class="flex space-x-4 justify-end mt-8">
+            <button class="btn btn-primary">
+                <?php
+                echo _e("Cancelar", "theme-tailwind") ?>
+            </button>
+            <button class="btn btn-outline">
+                <?php echo _e("Eliminar", "theme-tailwind") ?>
+            </button>
+        </div>
     </div>
-    <?php
-    wp_die();
+</div>
+<?php
+        wp_die();
 }
 
 add_action('wp_ajax_woocommerce_ajax_remove_from_cart_confirmation', 'woocommerce_ajax_remove_from_cart_confirmation');
@@ -511,6 +511,13 @@ function woocommerce_ajax_filter_products()
         'orderby' => 'menu_order title',
         'order' => 'ASC',
         'tax_query' => array(),
+        'meta_query' => array(
+            array(
+                'key' => '_stock_status',
+                'value' => 'outofstock',
+                'compare' => '!='
+            )
+        )
     );
 
     foreach ($params as $value) {
@@ -605,24 +612,24 @@ function woocommerce_ajax_filter_products()
     $the_query = new WP_Query($args);
     ?>
     <div id="count">
-        <?php echo $the_query->found_posts ?>
+    <?php echo $the_query->found_posts ?>
     </div>
-    <?php
-    woocommerce_product_loop_start();
-    while ($the_query->have_posts()) {
-        $the_query->the_post();
-        do_action('woocommerce_shop_loop');
-        wc_get_template_part('content', 'product');
-    }
-    woocommerce_product_loop_end();
-    $args = array(
-        'category' => $taxonomy,
-        'tax_query' => $args['tax_query'],
-        'total' => $the_query->max_num_pages,
-        'current' => 1
-    );
-    wc_get_template('loop/pagination.php', $args);
-    wp_die();
+<?php
+        woocommerce_product_loop_start();
+        while ($the_query->have_posts()) {
+            $the_query->the_post();
+            do_action('woocommerce_shop_loop');
+            wc_get_template_part('content', 'product');
+        }
+        woocommerce_product_loop_end();
+        $args = array(
+            'category' => $taxonomy,
+            'tax_query' => $args['tax_query'],
+            'total' => $the_query->max_num_pages,
+            'current' => 1
+        );
+        wc_get_template('loop/pagination.php', $args);
+        wp_die();
 }
 
 add_action('wp_ajax_woocommerce_ajax_filter_products', 'woocommerce_ajax_filter_products');
@@ -692,126 +699,126 @@ function woocommerce_ajax_rerender_filters()
 
     ?>
     <div class="overflow-auto">
-        <?php
-        $query_args = array(
-            'status' => 'publish',
-            'limit' => -1,
-            'orderby' => 'menu_order title',
-            'order' => 'ASC',
-            'tax_query' => $args['tax_query']
-        );
+    <?php
+    $query_args = array(
+        'status' => 'publish',
+        'limit' => -1,
+        'orderby' => 'menu_order title',
+        'order' => 'ASC',
+        'tax_query' => $args['tax_query']
+    );
+
+    if (isset($taxonomy) && strlen($taxonomy) > 0) {
+        $query_args['category'] = array($taxonomy);
+    }
+
+    $data = array();
+
+
+
+    if (count($new_args) > 0) {
+        foreach (wc_get_products($query_args) as $product) {
+            foreach ($product->get_attributes() as $tax => $attribute) {
+                if (in_array($tax, $toIgnore)) {
+                    continue;
+                }
+                $attribute_obj = get_taxonomy($tax);
+                $attribute_name = $attribute_obj->labels->singular_name;
+                $data[$tax]['name'] = $attribute_obj->labels->singular_name;
+                $data[$tax]['slug'] = $attribute_obj->name;
+                foreach ($attribute->get_terms() as $term) {
+                    $term_obj = new \stdClass();
+                    $term_obj->name = $term->name;
+                    $term_obj->slug = $term->slug;
+                    $term_obj->term_id = $term->term_id;
+                    $term_obj->count = 1;
+                    if (array_key_exists($tax, $data)) {
+                        if (array_key_exists('terms', $data[$tax])) {
+                            if (array_key_exists($term->term_id, $data[$tax]['terms'])) {
+                                $term_obj->count = $data[$tax]['terms'][$term->term_id]->count + 1;
+                            }
+                        }
+                    }
+                    $data[$tax]['terms'][$term->term_id] = $term_obj;
+                }
+            }
+        }
+    } else {
+        $table_name = $wpdb->prefix . 'sorefoz_attributes_categories_lookup';
+        $queryString = "";
 
         if (isset($taxonomy) && strlen($taxonomy) > 0) {
-            $query_args['category'] = array($taxonomy);
-        }
-
-        $data = array();
-
-
-
-        if (count($new_args) > 0) {
-            foreach (wc_get_products($query_args) as $product) {
-                foreach ($product->get_attributes() as $tax => $attribute) {
-                    if (in_array($tax, $toIgnore)) {
-                        continue;
-                    }
-                    $attribute_obj = get_taxonomy($tax);
-                    $attribute_name = $attribute_obj->labels->singular_name;
-                    $data[$tax]['name'] = $attribute_obj->labels->singular_name;
-                    $data[$tax]['slug'] = $attribute_obj->name;
-                    foreach ($attribute->get_terms() as $term) {
-                        $term_obj = new \stdClass();
-                        $term_obj->name = $term->name;
-                        $term_obj->slug = $term->slug;
-                        $term_obj->term_id = $term->term_id;
-                        $term_obj->count = 1;
-                        if (array_key_exists($tax, $data)) {
-                            if (array_key_exists('terms', $data[$tax])) {
-                                if (array_key_exists($term->term_id, $data[$tax]['terms'])) {
-                                    $term_obj->count = $data[$tax]['terms'][$term->term_id]->count + 1;
-                                }
-                            }
-                        }
-                        $data[$tax]['terms'][$term->term_id] = $term_obj;
-                    }
-                }
-            }
+            $queryString = 'SELECT * FROM ' . $table_name . ' WHERE tax_slug = "' . $taxonomy . '" ORDER BY attr_name ASC;';
         } else {
-            $table_name = $wpdb->prefix . 'sorefoz_attributes_categories_lookup';
-            $queryString = "";
+            $queryString = 'SELECT * FROM ' . $table_name . ' ;';
+        }
 
-            if (isset($taxonomy) && strlen($taxonomy) > 0) {
-                $queryString = 'SELECT * FROM ' . $table_name . ' WHERE tax_slug = "' . $taxonomy . '" ORDER BY attr_name ASC;';
-            } else {
-                $queryString = 'SELECT * FROM ' . $table_name . ' ;';
-            }
+        $query = $wpdb->get_results($queryString);
 
-            $query = $wpdb->get_results($queryString);
+        foreach ($query as $row) {
+            $attribute = array(
+                "name" => $row->attr_name,
+                "slug" => $row->attr_slug,
+                "terms" => []
+            );
+            $data[$row->attr_slug] = $attribute;
+        }
 
+        foreach ($data as $attribute) {
             foreach ($query as $row) {
-                $attribute = array(
-                    "name" => $row->attr_name,
-                    "slug" => $row->attr_slug,
-                    "terms" => []
-                );
-                $data[$row->attr_slug] = $attribute;
+                if ($attribute["slug"] !== $row->attr_slug) {
+                    continue;
+                }
+                $term = new \stdClass();
+                $term->name = $row->term_name;
+                $term->slug = $row->term_slug;
+                $term->count = $row->product_count;
+                $data[$row->attr_slug]["terms"][$row->term_slug] = $term;
             }
+        }
+    }
 
-            foreach ($data as $attribute) {
-                foreach ($query as $row) {
-                    if ($attribute["slug"] !== $row->attr_slug) {
+    ksort($data);
+
+
+    if (count($new_args) > 0) {
+        ?>
+        <div class="mb-4 p-4">
+            <ul>
+                <?php
+                foreach ($new_args as $arg) {
+                    if ($arg["terms"][0] === "orderby") {
                         continue;
                     }
-                    $term = new \stdClass();
-                    $term->name = $row->term_name;
-                    $term->slug = $row->term_slug;
-                    $term->count = $row->product_count;
-                    $data[$row->attr_slug]["terms"][$row->term_slug] = $term;
-                }
-            }
-        }
-
-        ksort($data);
-
-
-        if (count($new_args) > 0) {
-            ?>
-            <div class="mb-4 p-4">
-                <ul>
-                    <?php
-                    foreach ($new_args as $arg) {
-                        if ($arg["terms"][0] === "orderby") {
-                            continue;
+                    $slug = $arg["terms"][0];
+                    $foundField = array_filter(
+                        $data[$arg["taxonomy"]]['terms'],
+                        function ($field) use ($slug) {
+                            return $field->slug === $slug;
                         }
-                        $slug = $arg["terms"][0];
-                        $foundField = array_filter(
-                            $data[$arg["taxonomy"]]['terms'],
-                            function ($field) use ($slug) {
-                                return $field->slug === $slug;
-                            }
-                        );
-                        $firstKey = array_key_first($foundField);
-                        ?>
-                        <li class="flex mb-2">
-                            <div class="clear-filter flex flex-row text-white bg-secondary py-1 px-2 rounded-full items-center space-x-1 cursor-pointer"
-                                data-value="<?php echo $arg['terms'][0] ?>" data-attribute="<?php echo $arg["taxonomy"] ?>"
-                                data-taxonomy="<?php echo isset($taxonomy) ? $taxonomy : '' ?>">
-                                <div class="pointer-events-none">
-                                    <?php echo $icons->get_icon('AiOutlineCloseCircle') ?>
-                                </div>
-                                <div class="pointer-events-none text-sm">
-                                    <?php echo $foundField[$firstKey]->name ?>
-                                </div>
+                    );
+                    $firstKey = array_key_first($foundField);
+                    ?>
+                    <li class="flex mb-2">
+                        <div class="clear-filter flex flex-row text-white bg-secondary py-1 px-2 rounded-full items-center space-x-1 cursor-pointer"
+                            data-value="<?php echo $arg['terms'][0] ?>" data-attribute="<?php echo $arg["taxonomy"] ?>"
+                            data-taxonomy="<?php echo isset($taxonomy) ? $taxonomy : '' ?>">
+                            <div class="pointer-events-none">
+                                <?php echo $icons->get_icon('AiOutlineCloseCircle') ?>
                             </div>
-                        </li>
-                    <?php } ?>
-                </ul>
-                <button class="clear-all-filters text-sm text-secondary"
-                    data-taxonomy="<?php echo isset($taxonomy) ? $taxonomy : '' ?>">Limpar tudo (<?php echo count($new_args) ?>)</button>
-            </div>
-            <?php
-        }
-        foreach ($data as $key => $attribute) { ?>
+                            <div class="pointer-events-none text-sm">
+                                <?php echo $foundField[$firstKey]->name ?>
+                            </div>
+                        </div>
+                    </li>
+                <?php } ?>
+            </ul>
+            <button class="clear-all-filters text-sm text-secondary"
+                data-taxonomy="<?php echo isset($taxonomy) ? $taxonomy : '' ?>">Limpar tudo (<?php echo count($new_args) ?>)</button>
+        </div>
+        <?php
+    }
+    foreach ($data as $key => $attribute) { ?>
             <div class="mb-4 p-4">
                 <h4 class="font-bold uppercase mb-4 border-b">
                     <?php echo $attribute['name'] ?>
@@ -845,8 +852,8 @@ function woocommerce_ajax_rerender_filters()
             </div>
         <?php } ?>
     </div>
-    <?php
-    wp_die();
+<?php
+        wp_die();
 }
 
 add_action('wp_ajax_woocommerce_ajax_rerender_filters', 'woocommerce_ajax_rerender_filters');
@@ -949,6 +956,7 @@ function search_products()
                         'value' => $wpdb->esc_like($keyword),
                         'compare' => 'LIKE',
                     ),
+
                 ),
             )
         );
@@ -1052,19 +1060,19 @@ function custom_add_wc_attribute_type()
     <div class="form-field">
         <label for="type-field">Type</label>
         <select name="type" id="type-field" value="<?php echo esc_attr($value); ?>">
-            <option value="square">Square</option>
-            <option value="radio">Radio</option>
-            <option value="color">Color</option>
-        </select>
-        <p class="description">Set your attribute display style</p>
-    </div>
+        <option value="square">Square</option>
+        <option value="radio">Radio</option>
+        <option value="color">Color</option>
+    </select>
+    <p class="description">Set your attribute display style</p>
+</div>
 
-    <div class="form-field">
-        <label for="type-show">Show on frontend?</label>
-        <input type="checkbox" id="type-show" name="show" checked>
-        <p class="description">Chose if this filter appear on frontend.</p>
-    </div>
-    <?php
+<div class="form-field">
+    <label for="type-show">Show on frontend?</label>
+    <input type="checkbox" id="type-show" name="show" checked>
+    <p class="description">Chose if this filter appear on frontend.</p>
+</div>
+<?php
 }
 add_action('woocommerce_after_add_attribute_fields', 'custom_add_wc_attribute_type');
 
@@ -1194,3 +1202,39 @@ function wlb_save_extra_details($post_id, $post)
     update_post_meta($post_id, '_wlb_tracking_code', wc_clean($_POST['_wlb_tracking_code']));
 }
 add_action('woocommerce_before_save_order_items', 'wlb_save_extra_details', 45, 2);
+
+add_filter('woocommerce_product_query_meta_query', 'shop_only_instock_products', 10, 2);
+function shop_only_instock_products($meta_query, $query)
+{
+
+    // Only on shop archive pages
+    if (is_admin() || is_search() || !is_shop())
+        return $meta_query;
+    $meta_query[] = array(
+        'key' => '_stock_status',
+        'value' => 'outofstock',
+        'compare' => ' != '
+    );
+
+    return $meta_query;
+}
+
+add_filter('woocommerce_product_query_meta_query', 'filter_product_query_meta_query', 10, 2);
+function filter_product_query_meta_query($meta_query, $query)
+{
+
+    // On woocommerce home page only
+    if (is_front_page()) {
+
+        // Exclude products "out of stock"
+        $meta_query[] = array(
+            'key' => '_stock_status',
+            'value' => 'outofstock',
+            'compare' => '!=',
+        );
+
+    }
+    return $meta_query;
+}
+
+add_filter('woocommerce_product_backorders_allowed', '__return_false');

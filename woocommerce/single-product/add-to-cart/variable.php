@@ -20,6 +20,8 @@ if ($product->is_type('simple')) { //if simple product
 $pre_venda_ativo = get_field('pre_venda_ativo', $product->get_id());
 $pre_venda_mensagem = get_field('pre_venda_mensagem', $product->get_id());
 
+$mensagem_promo = get_field("mensagem_promo", "option")
+
 ?>
 <div class="woocommerce-variation-add-to-cart variations_button">
     <?php do_action('woocommerce_before_add_to_cart_button'); ?>
@@ -89,18 +91,15 @@ $pre_venda_mensagem = get_field('pre_venda_mensagem', $product->get_id());
             </div>
             <button type="submit" class="variation_add_to_cart_button btn btn-primary alt">Adicionar</button>
         </div>
-        <?php if ($pre_venda_ativo): ?>
+        <?php if ($pre_venda_ativo) : ?>
             <div class="uppercase font-roboto text-xs text-amarelo text-center py-4">
-                <?= $pre_venda_mensagem ?>
+                <?php echo $pre_venda_mensagem ?>
             </div>
 
         <?php endif; ?>
-        <?php if ($percentage && $percentage > 0): ?>
-            <div class="uppercase font-roboto text-xs text-amarelo text-center py-4">
-                Promoções de 20% a 50%, campanha válida de 1 de janeiro a 30 de junho 2023.
-            </div>
+        <?php if ($percentage && $percentage > 0) : ?>
+          <div class="uppercase font-roboto text-xs text-amarelo text-center py-4"><?php echo $mensagem_promo?></div>
         <?php endif; ?>
-
 
     </div>
     <?php do_action('woocommerce_after_add_to_cart_button'); ?>

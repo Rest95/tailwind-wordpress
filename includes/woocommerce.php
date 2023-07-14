@@ -1237,4 +1237,42 @@ function filter_product_query_meta_query($meta_query, $query)
     return $meta_query;
 }
 
-add_filter('woocommerce_product_backorders_allowed', '__return_false');
+add_filter('woocommerce_product_backorders_allowed', '__return_false', 1000);
+add_filter('woocommerce_product_backorders_require_notification', '__return_false', 1000);
+
+add_filter('woocommerce_product_get_backorders', 'get_backorders_return_no');
+add_filter('woocommerce_product_variation_get_backorders', 'get_backorders_return_no');
+function get_backorders_return_no($backorders)
+{
+    return 'no';
+}
+
+add_filter('woocommerce_product_get_stock_status', 'filter_product_stock_status', 10, 2);
+add_filter('woocommerce_product_variation_get_stock_status', 'filter_product_stock_status', 10, 2);
+function filter_product_stock_status($stock_status, $product)
+{
+    return $product->get_manage_stock() && $product->get_stock_quantity() <= 0 ? 'outofstock' : $stock_status;
+}
+
+add_action('admin_footer', 'disable_backorder_option_from_product_settings');
+function disable_backorder_option_from_product_settings()
+{
+    global $pagenow, $post_type;
+
+    if (in_array($pagenow, array('post-new.php', 'post.php')) && $post_type === 'product'):
+        ?>
+        <script>
+            jQuery(function ($) {
+                // For product variations
+                $('#variable_product_options').on('change', function () {
+                    $('select[name^=variable_backorders]').each(function () {
+                        $(this).val('no');
+                    });
+                });
+                // For all other product types
+                $('select#_backorders').val('no');
+            });
+        </script>
+        <?php
+    endif;
+}

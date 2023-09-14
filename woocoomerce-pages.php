@@ -50,6 +50,9 @@ get_header(); ?>
       if (get_row_layout() == 'cta_categorias'):
         get_template_part('template-parts/layout/blocks/cta_categorias', 'cta_categorias', array('index' => $index));
       endif;
+      if (get_row_layout() == 'newsletter'):
+        get_template_part('template-parts/layout/blocks/newsletter', 'newsletter', array('index' => $index));
+      endif;
       $index++;
     endwhile;
   endif;

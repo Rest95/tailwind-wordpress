@@ -1140,6 +1140,13 @@ function get_variable_sale_percentage($product)
     $variation_min_sale_price = $product->get_variation_sale_price('min', true);
     $variation_max_sale_price = $product->get_variation_sale_price('max', true);
 
+    if($variation_min_regular_price == 0){
+      $variation_min_regular_price = 1;
+    }
+    if($variation_max_regular_price == 0){
+      $variation_max_regular_price = 1;
+    }
+
     //get highest and lowest percentages
     $lower_percentage = round((($variation_min_regular_price - $variation_min_sale_price) / $variation_min_regular_price) * 100);
     $higher_percentage = round((($variation_max_regular_price - $variation_max_sale_price) / $variation_max_regular_price) * 100);

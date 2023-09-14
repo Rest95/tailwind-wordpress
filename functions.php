@@ -956,7 +956,7 @@ add_action('wp_ajax_subscribe_to_egoi_newsletter', 'subscribe_to_egoi_newsletter
 function subscribe_to_egoi_newsletter()
 {
     $list_id = 1;
-    $api_key = "";
+    $api_key = "31c6048f18c9ae854aa44aef4270c1865059bef0";
 
     $data = json_decode(stripslashes($_POST['data']));
     $data = json_encode($data);

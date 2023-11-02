@@ -1051,7 +1051,7 @@ add_action(
     }, 10, 0
 );
 
-add_filter(
+/*add_filter(
     'rest_authentication_errors', function ( $result ) {
         // If a previous authentication check was applied,
         // pass that result along without modification.
@@ -1073,4 +1073,10 @@ add_filter(
         // on logged-in requests
         return $result;
     }
-);
+);*/
+add_filter( 'oembed_response_data', 'disable_embeds_filter_oembed_response_data_' );
+function disable_embeds_filter_oembed_response_data_( $data ) {
+	unset($data[‘author_url’]);
+	unset($data[‘author_name’]);
+	return $data;
+}

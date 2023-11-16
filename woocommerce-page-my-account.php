@@ -47,6 +47,27 @@ get_header(); ?>
             if (get_row_layout() == 'grid_texto_img_btn'):
                 get_template_part('template-parts/layout/blocks/grid_texto_img_btn', 'grid_texto_img_btn', array('index' => $index));
             endif;
+            if (get_row_layout() == 'grid_texto_img_btn_b'):
+                get_template_part('template-parts/layout/blocks/grid_texto_img_btn_b', 'grid_texto_img_btn_b', array('index' => $index));
+            endif;
+            if (get_row_layout() == 'grid_masonry'):
+                get_template_part('template-parts/layout/blocks/grid_masonry', 'grid_masonry', array('index' => $index));
+            endif;
+            if (get_row_layout() == 'acordeao'):
+                get_template_part('template-parts/layout/blocks/acordeao', 'acordeao', array('index' => $index));
+            endif;
+            if (get_row_layout() == 'listagem_de_tamanhos'):
+                get_template_part('template-parts/layout/blocks/listagem_de_tamanhos', 'listagem_de_tamanhos', array('index' => $index));
+            endif;
+            if (get_row_layout() == 'cta_manequim'):
+                get_template_part('template-parts/layout/blocks/cta_manequim', 'cta_manequim', array('index' => $index));
+            endif;
+            if (get_row_layout() == 'produtos_em_destaque'):
+                get_template_part('template-parts/layout/blocks/produtos_em_destaque', 'produtos_em_destaque', array('index' => $index));
+            endif;
+            if (get_row_layout() == 'formulario_contacto'):
+                get_template_part('template-parts/layout/blocks/formulario_contacto', 'formulario_contacto', array('index' => $index));
+            endif;
             if (get_row_layout() == 'cta_categorias'):
                 get_template_part('template-parts/layout/blocks/cta_categorias', 'cta_categorias', array('index' => $index));
             endif;

@@ -37,6 +37,9 @@
             if (get_row_layout() == 'grid_texto_img_btn'):
                 get_template_part('template-parts/layout/blocks/grid_texto_img_btn', 'grid_texto_img_btn', array('index' => $index));
             endif;
+            if (get_row_layout() == 'grid_texto_img_btn_b'):
+                get_template_part('template-parts/layout/blocks/grid_texto_img_btn_b', 'grid_texto_img_btn_b', array('index' => $index));
+            endif;
             if (get_row_layout() == 'grid_masonry'):
                 get_template_part('template-parts/layout/blocks/grid_masonry', 'grid_masonry', array('index' => $index));
             endif;

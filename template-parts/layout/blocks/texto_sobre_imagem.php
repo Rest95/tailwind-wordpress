@@ -12,7 +12,9 @@ $link_btn = get_sub_field("link_botao");
     </div>
     <div class="relative flex flex-col items-center justify-center space-y-8">
       <h1 class="text-white text-3xl sm:text-4xl md:text-5xl font-bold uppercase max-w-[300px] md:max-w-[430px] text-center font-roboto"><?php echo $titulo; ?></h1>
-      <a class="btn btn-negative" href="<?php echo $link_btn ?>"><?php echo $label_btn ?></a>
+<?php if($link_btn): ?>
+<a class="btn btn-negative" href="<?php echo $link_btn ?>"><?php echo $label_btn ?></a>
+<?php endif;?>
     </div>
   </div>
 </section>

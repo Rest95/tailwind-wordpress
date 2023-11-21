@@ -63,7 +63,7 @@ if($product->is_in_stock()) : ?>
     //     )
     // );
     
-    // do_action('woocommerce_after_add_to_cart_quantity');
+  // do_action('woocommerce_after_add_to_cart_quantity');
     ?>
 
         <div class="flex justify-between mt-8 pt-4 border-t-gray-400 border-t w-full">
@@ -72,7 +72,7 @@ if($product->is_in_stock()) : ?>
                     <div class="text-secondary price-box uppercase text-center font-roboto text-2xl">
                         <?php echo $product->get_price_html(); ?>
                     </div>
-                    <?php if ($percentage) { ?>
+                    <?php if ($percentage && $product->is_on_sale()) { ?>
                         <div>
                             <span class="bg-amarelo text-white rounded-sm text-sm px-1 py-px sm:px-2 sm:py-1 font-roboto">
                         <?php echo '-' . $percentage ?>%
@@ -96,7 +96,7 @@ if($product->is_in_stock()) : ?>
         </div>
 
     <?php endif; ?>
-    <?php if ($percentage && $percentage > 0) : ?>
+    <?php if ($percentage && $percentage > 0 && $product->is_on_sale()) : ?>
         <div class="uppercase font-roboto text-xs text-amarelo text-center py-4">
           <?php echo $mensagem_promo; ?>
         </div>

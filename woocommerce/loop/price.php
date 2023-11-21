@@ -22,7 +22,7 @@ if (!defined('ABSPATH')) {
 global $product;
 $percentage = 0;
 if ($product->is_type('simple')) { //if simple product
-    if ($product->sale_price) {
+    if ($product->sale_price && $product->is_on_sale()) {
         $percentage = round(((floatval($product->regular_price) - floatval($product->sale_price)) / floatval($product->regular_price)) * 100);
     }
 } else { //if variable product

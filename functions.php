@@ -1012,7 +1012,8 @@ add_action('login_enqueue_scripts', 'wlb_login_logo');
 //fim de copia
 
 add_action(
-    'woocommerce_cart_calculate_fees', function () {
+    'woocommerce_cart_calculate_fees',
+    function () {
         if (is_admin()) {
             return;
         }
@@ -1027,7 +1028,9 @@ add_action(
 
             WC()->cart->add_fee($title, floatval($amount), false, $tax);
         }
-    }, 10, 0
+    },
+    10,
+    0
 );
 
 /**
@@ -1035,7 +1038,8 @@ add_action(
  * method so we need to trigger update here
  */
 add_action(
-    'wp_head', function () {
+    'wp_head',
+    function () {
         ?>
     <script type="text/javascript">
         jQuery(document).ready(function ($) {
@@ -1047,36 +1051,68 @@ add_action(
             });
         });
     </script>
-        <?php
-    }, 10, 0
+    <?php
+    },
+    10,
+    0
 );
 
-/*add_filter(
-    'rest_authentication_errors', function ( $result ) {
+add_filter(
+    'rest_authentication_errors',
+    function ($result) {
         // If a previous authentication check was applied,
         // pass that result along without modification.
-        if (true === $result || is_wp_error($result) ) {
+        if (true === $result || is_wp_error($result)) {
             return $result;
         }
-     
+
         // No authentication has been performed yet.
         // Return an error if user is not logged in.
-        if (! is_user_logged_in() ) {
+        if (!is_user_logged_in()) {
             return new WP_Error(
                 'rest_not_logged_in',
                 __('You are not currently logged in.'),
-                array( 'status' => 401 )
+                array('status' => 401)
             );
         }
-     
+
         // Our custom authentication check should have no effect
         // on logged-in requests
         return $result;
     }
-);*/
-add_filter( 'oembed_response_data', 'disable_embeds_filter_oembed_response_data_' );
-function disable_embeds_filter_oembed_response_data_( $data ) {
-	unset($data[‘author_url’]);
-	unset($data[‘author_name’]);
-	return $data;
+);
+
+add_filter('oembed_response_data', 'disable_embeds_filter_oembed_response_data_');
+function disable_embeds_filter_oembed_response_data_($data)
+{
+    unset($data['author_url']);
+    unset($data['author_name']);
+    return $data;
 }
+
+function hide_shipping_when_free_is_available($rates, $package)
+{
+    $new_rates = array();
+    foreach ($rates as $rate_id => $rate) {
+        // Only modify rates if free_shipping is present.
+        if ('free_shipping' === $rate->method_id) {
+            $new_rates[$rate_id] = $rate;
+            break;
+        }
+    }
+
+    if (!empty($new_rates)) {
+        //Save local pickup if it's present.
+        foreach ($rates as $rate_id => $rate) {
+            if ('local_pickup' === $rate->method_id) {
+                $new_rates[$rate_id] = $rate;
+                break;
+            }
+        }
+        return $new_rates;
+    }
+
+    return $rates;
+}
+
+add_filter('woocommerce_package_rates', 'hide_shipping_when_free_is_available', 10, 2);

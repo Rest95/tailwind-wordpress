@@ -208,7 +208,7 @@ if (!function_exists('theme_woocommerce_floating_cart')) {
                         $product_thumbnail_alt = get_post_meta($post_thumbnail_id, '_wp_attachment_image_alt', true);
                         $percentage = 0;
                         $show_preco = $product->get_regular_price();
-                        if ($product->get_sale_price()) {
+                        if ($product->get_sale_price() && $product->is_on_sale()) {
                             $percentage = round(((floatval($product->get_regular_price()) - floatval($product->get_sale_price())) / floatval($product->get_regular_price())) * 100);
                             $show_preco = $product->get_sale_price();
                         }

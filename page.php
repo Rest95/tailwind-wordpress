@@ -64,7 +64,12 @@
             if (get_row_layout() == 'newsletter'):
                 get_template_part('template-parts/layout/blocks/newsletter', 'newsletter', array('index' => $index));
             endif;
-
+            if (get_row_layout() == 'product_card_olympic_games'):
+                get_template_part('template-parts/layout/blocks/product_card_olympic_games', 'product_card_olympic_games', array('index' => $index));
+            endif;
+            if (get_row_layout() == 'titulo_de_pagina'):
+                get_template_part('template-parts/layout/blocks/titulo_de_pagina', 'titulo_de_pagina', array('index' => $index));
+            endif;
             $index++;
         endwhile;
     endif;

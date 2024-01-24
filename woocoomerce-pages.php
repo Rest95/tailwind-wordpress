@@ -4,25 +4,25 @@
 get_header(); ?>
 
 <div class="w-full">
-  <?php
-  /*
-  if (!is_front_page()) : ?>
-  <section class="px-4 md:px-6 font-roboto text-sm my-4 md:my-8">
-  <div class="border-t border-b border-gray-400 py-2">
-  <?php echo do_shortcode(' [wpseo_breadcrumb] '); ?>
-  </div>
-  </section>
-  <?php endif;  */?>
-  <section class="max-w-screen-2xl px-4 md:px-6 mx-auto my-4 md:my-8">
-    <?php echo
-      the_content();
-    ?>
-  </section>
-  <?php
-  $index = 0;
-  if (have_rows('layout_de_pagina')):
-    while (have_rows('layout_de_pagina')):
-      the_row();
+    <?php
+    /*
+    if (!is_front_page()) : ?>
+    <section class="px-4 md:px-6 font-roboto text-sm my-4 md:my-8">
+    <div class="border-t border-b border-gray-400 py-2">
+    <?php echo do_shortcode(' [wpseo_breadcrumb] '); ?>
+    </div>
+    </section>
+    <?php endif;  */?>
+    <section class="max-w-screen-2xl px-4 md:px-6 mx-auto my-4 md:my-8">
+        <?php echo
+            the_content();
+        ?>
+    </section>
+    <?php
+    $index = 0;
+    if (have_rows('layout_de_pagina')):
+        while (have_rows('layout_de_pagina')):
+            the_row();
             if (get_row_layout() == 'video_e_texto'):
                 get_template_part('template-parts/layout/blocks/video_e_texto', 'video_e_texto', array('index' => $index));
             endif;
@@ -74,10 +74,16 @@ get_header(); ?>
             if (get_row_layout() == 'newsletter'):
                 get_template_part('template-parts/layout/blocks/newsletter', 'newsletter', array('index' => $index));
             endif;
-      $index++;
-    endwhile;
-  endif;
+            if (get_row_layout() == 'product_card_olympic_games'):
+                get_template_part('template-parts/layout/blocks/product_card_olympic_games', 'product_card_olympic_games', array('index' => $index));
+            endif;
+            if (get_row_layout() == 'titulo_de_pagina'):
+                get_template_part('template-parts/layout/blocks/titulo_de_pagina', 'titulo_de_pagina', array('index' => $index));
+            endif;
+            $index++;
+        endwhile;
+    endif;
 
-  ?>
+    ?>
 </div>
 <?php get_footer(); ?>

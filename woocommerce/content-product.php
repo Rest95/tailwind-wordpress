@@ -55,7 +55,7 @@ $post_thumbnail_id = $product->get_image_id();
 $image = wp_get_attachment_image_url($post_thumbnail_id, 'full');
 $gallery = $product->get_gallery_image_ids();
 ?>
-<li <?php wc_product_class('col-span-1 border-b group border-gray-400 px-0 pb-4 md:pb-8 relative', $product); ?>>
+<li <?php wc_product_class('col-span-1 group  px-0 pb-4 md:pb-8 relative', $product); ?>>
     <?php
     /**
      * Hook: woocommerce_before_shop_loop_item.
@@ -75,16 +75,16 @@ $gallery = $product->get_gallery_image_ids();
     ?>
 
     <div class="relative w-full ">
-        <div class="overflow-hidden aspect-productImg relative md:mx-6">
+        <div class="overflow-hidden aspect-productImg relative">
             <div
-                class="aspect-productImg absolute bg-white w-full  <?php echo (count($gallery)) > 1 ? 'group-hover:opacity-0 transition-all duration-[350ms] ease-in-out' : '' ?>">
+                class="aspect-productImg absolute bg-[#efefef] w-full  <?php echo (count($gallery)) > 1 ? 'group-hover:opacity-0 transition-all duration-[350ms] ease-in-out' : '' ?>">
                 <img src="<?php echo $image ?>" class="image-fill" alt="<?php echo $product->get_name() ?>" />
             </div>
             <?php if ($gallery && count($gallery) > 1) {
                 $image_g = wp_get_attachment_image_url($gallery[1], 'full');
                 ?>
                 <div
-                    class="aspect-productImg absolute bg-white w-full opacity-0  group-hover:opacity-100 transition-all duration-[300ms] ease-in-out">
+                    class="aspect-productImg absolute bg-[#efefef] w-full opacity-0  group-hover:opacity-100 transition-all duration-[300ms] ease-in-out">
                     <img src="<?php echo $image_g ?>" class="image-fill" alt="<?php echo $product->get_name() ?>" />
                 </div>
             <?php } ?>
@@ -111,10 +111,10 @@ $gallery = $product->get_gallery_image_ids();
             </div>
         <?php } ?>
 
-        <h3 class="text-sm md:text-base uppercase px-2 text-center mb-2">
+        <h3 class="text-sm md:text-base uppercase text-left mb-1 mt-1">
             <?php echo $product->get_name() ?>
         </h3>
-        <div class="text-center">
+        <div class="text-left">
             <?php
 
             /**

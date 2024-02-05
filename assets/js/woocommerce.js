@@ -673,6 +673,7 @@ jQuery(document).ready(function ($) {
       const input = btn.currentTarget.parentElement.querySelector(
         "input.qty[type='number']"
       );
+
       if (parseInt(input.value) > 1) {
         let current = parseInt(input.value) - 1;
         $(this).next(".qty").val(current).trigger("change");
@@ -683,7 +684,13 @@ jQuery(document).ready(function ($) {
       const input = btn.currentTarget.parentElement.querySelector(
         "input.qty[type='number']"
       );
-      let current = parseInt(input.value) + 1;
+      let max = input.max;
+      if (max) {
+        let current = parseInt(input.value) + 1;
+        if (current > max) {
+          return;
+        }
+      }
       $(this).prev(".qty").val(current).trigger("change");
     });
 

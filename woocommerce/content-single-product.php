@@ -12,7 +12,7 @@
  *
  * @see     https://docs.woocommerce.com/document/template-structure/
  * @package WooCommerce\Templates
- * @version 3.6.0
+ * @version 7.3.0
  */
 
 defined('ABSPATH') || exit;
@@ -22,25 +22,6 @@ $icons = new Icons();
 global $product;
 $id = $product->get_id();
 
-$collection_gallery = get_field('collection_gallery', $id);
-$care = get_field('care', $id);
-
-
-$careIndex = [
-  'A temperatura máxima da água para lavagem da peça é de 40 graus.' => 'cuidados_1.webp',
-  'Lavagem à máquina em ciclo delicado com temperatura maxima de 40 graus.' => 'cuidados_2.webp',
-  'A temperatura máxima da água para lavagem da peça é de 30 graus.' => 'cuidados_3.webp',
-  'Não secar na máquina.' => 'cuidados_4.webp',
-  'A peça não suporta branqueamento nem pré-tratamento de nódoas com produtos à base de cloro ou oxigénio. Verifique o rótulo dos produtos de limpeza antes de utilizar.' => 'cuidados_5.webp',
-  'Limpeza a seco somente percloroetileno.' => 'cuidados_6.webp',
-  'Engomar a média temperatura (até 150 oC).' => 'cuidados_7.webp',
-  'Não limpar a seco. Não usar produtos tira-nódoas que contenham solventes.' => 'cuidados_8.webp',
-  'Não engomar.' => 'cuidados_9.webp',
-  'Lavar à mão.' => 'cuidados_10.webp',
-];
-
-
-
 /**
  * Hook: woocommerce_before_single_product.
  *
@@ -49,116 +30,148 @@ $careIndex = [
 do_action('woocommerce_before_single_product');
 
 if (post_password_required()) {
-    echo get_the_password_form(); // WPCS: XSS ok.
-    return;
+  echo get_the_password_form(); // WPCS: XSS ok.
+  return;
 }
+
+$is_b2b = false;
+$mensagem_promo = get_field("mensagem_promo", "option");
+
+
+$pre_venda_ativo = get_field('pre_venda_ativo', $product->get_id());
+$pre_venda_mensagem = get_field('pre_venda_mensagem', $product->get_id());
+
+$mensagem_promocional = get_field('mensagem_promocional', $product->get_id());
+
+$collection_gallery = get_field('collection_gallery', $id);
+
+
+$percentage = 0;
+if (!$is_b2b) {
+  if ($product->is_type('simple')) { //if simple product
+    if ($product->sale_price) {
+      $percentage = round(((floatval($product->regular_price) - floatval($product->sale_price)) / floatval($product->regular_price)) * 100);
+    }
+  } else { //if variable product
+    $percentage = apply_filters('get_variable_sale_percentage', $product);
+  }
+}
+
 $gamas = wp_get_post_terms($id, array('gamas'), array("fields" => "names"));
 
-$related_colors = $product->get_upsell_ids();
-$related_used = array();
-$colors = array();
-
-
-if (count($related_colors) > 0) {
-    foreach ($related_colors as $related_color) {
-        $related_color_object = wc_get_product($related_color);
-        $taxonomy = 'pa_cor';
-        $term_names = wp_get_post_terms($related_color_object->get_id(), $taxonomy);
-
-        if (count($term_names) > 0) {
-            foreach ($term_names as $term) {
-                if (in_array($term->term_id, $related_used)) {
-                    continue;
-                }
-                $attr = new stdClass();
-                $attr->name = $term->name;
-                $attr->id = $term->term_id;
-                $attr->slug = $term->slug;
-                $attr->url = get_permalink($related_color_object->get_id());
-                $attr->current = false;
-                array_push($colors, $attr);
-                array_push($related_used, $term->term_id);
-            }
-        }
-        $prd_term_names = wp_get_post_terms($product->get_id(), $taxonomy);
-        if (count($prd_term_names) > 0) {
-            foreach ($prd_term_names as $term) {
-                if (in_array($term->term_id, $related_used)) {
-                    continue;
-                }
-                $attr = new stdClass();
-                $attr->name = $term->name;
-                $attr->id = $term->term_id;
-                $attr->slug = $term->slug;
-                $attr->url = false;
-                $attr->current = true;
-                array_push($colors, $attr);
-                array_push($related_used, $term->term_id);
-            }
-        }
-    }
-}
-
-if (count($colors) > 0) {
-    usort($colors, fn($a, $b) => strcmp($a->name, $b->name));
-}
-
-
 ?>
-
-<section class="px-4 md:px-6 ">
+<section class="px-4 md:px-6">
   <div id="product-<?php the_ID(); ?>" <?php wc_product_class('', $product); ?>>
-    <div class="max-w-xl mx-auto  mt-8">
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_1fr]">
       <div>
-        <h2 class="uppercase font-roboto text-sm mb-4 text-gray-400 text-center">
-          <?php echo $gamas ? 'GAMA ' . $gamas[0] : '' ?>
-        </h2>
-        <h1 class="uppercase font-roboto text-2xl md:text-3xl text-center font-bold">
-          <?php echo $product->get_name(); ?>
-        </h1>
+        <div class="hidden lg:block h-auto overflow-hidden bg-[#efefef]">
+          <?php get_template_part('woocommerce/single-product/product-gallery-desktop'); ?>
+        </div>
+        <div class="block lg:hidden h-[400px]">
+          <?php get_template_part('woocommerce/single-product/product-image-gallery'); ?>
+        </div>
       </div>
-      <div>
-        <?php get_template_part('woocommerce/single-product/product-image'); ?>
-      </div>
-      <div>
-        <?php if (count($colors) > 0) { ?>
-          <section class="pt-2 pb-4 md:pt-4 md:pb-8">
-            <ul class="flex gap-2 items-center justify-center">
-              <?php
-                foreach ($colors as $color) {
-                    $bg_color = get_field('color', 'term_' . $color->id);
-                    ?>
-                <li class="p-0.5 border border-black ">
-                    <?php if ($color->url) { ?>
-                    <a href="<?php echo $color->url ?>" class="z-[2] relative">
-                    <?php } ?>
-                    <div
-                      class="w-8 h-8 md:w-6 md:h-6 relative overflow-hidden  <?php echo $color->current ? 'outline outline-black outline-2' : '' ?> ">
-                      <div class="flex w-full h-full rotate-45 scale-[2]">
-                        <div class="w-full h-full" style="background-color: <?php echo $bg_color ?>; "></div>
-                      </div>
-                    </div>
-                    <?php if ($color->url) { ?>
-                    </a>
-                    <?php } ?>
-                </li>
-                    <?php
-                }
-                ?>
-            </ul>
-          </section>
-            <?php
-        }
+      <div class="py-4 lg:py-12 lg:px-4 lg:pl-40 relative">
+        <div class="flex flex-col max-w-[545px] sticky top-[170px]">
+          <div class="flex flex-row justify-start space-x-2 order-2 lg:order-1 mt-4 lg:mt-0">
+            <?php if (has_term('hunny', 'marca', $id)) { ?>
+              <div class="flex">
+                <span
+                  class="bg-secondary text-[10px] tracking-wider text-graybg uppercase rounded-full px-2 py-[0.15rem] flex">Hunny</span>
+              </div>
+            <?php } ?>
+            <?php if (has_term('aura', 'marca', $id)) { ?>
+              <div class="flex">
+                <span
+                  class="bg-secondary text-[10px] tracking-wider text-graybg uppercase rounded-full px-2 py-[0.15rem] flex">Aura</span>
+              </div>
+            <?php } ?>
+          </div>
+          <div class="order-1 lg:order-2 flex-col lg:flex-row flex justify-between items-start mt-4">
+            <div class="flex-shrink-0 flex flex-col">
+              <h2 class="uppercase font-roboto text-sm mb-1 lg:mb-4 text-black text-left font-normal">
+                <?php echo $gamas ? 'GAMA ' . $gamas[0] : '' ?>
+              </h2>
+              <h1
+                class="font-roboto text-base md:text-[24px] text-black  xl:text-[32px] text-left font-semibold uppercase ">
+                <?php echo $product->get_name(); ?>
+              </h1>
+              <?php if ($product->get_sku()): ?>
+                <div class="text-[#9CA3AF] font-roboto text-sm uppercase tracking-wide mt-1 lg:mt-2">
+                  Ref.ª
+                  <?php echo $product->get_sku(); ?>
+                </div>
+              <?php endif; ?>
+            </div>
+          </div>
+          <div class="flex lg:hidden justify-between items-start font-normal pt-2 pb-4 order-4">
+            <div class="flex w-full items-center">
+              <div class="text-secondary price-box uppercase text-center font-roboto text-2xl">
+                <?php echo $product->get_price_html(); ?>
+              </div>
+              <?php if ($percentage && $product->is_on_sale()) { ?>
+                <div>
+                  <span class="bg-amarelo text-white rounded-sm text-sm px-1 py-px sm:px-2 sm:py-1 font-roboto">
+                    <?php echo '-' . $percentage ?>%
+                  </span>
+                </div>
+              <?php } ?>
+            </div>
+          </div>
+          <div class="hidden lg:flex w-full justify-between items-center mt-4 font-normal lg:order-5 pt-2 pb-8">
+            <input type="hidden" name="current_price" value="<?php echo $product->get_price() ?>" id="current_price">
+            <div class="flex w-full items-center">
+              <div class="text-secondary price-box uppercase text-center font-roboto text-2xl">
+                <?php echo $product->get_price_html(); ?>
+              </div>
+              <?php if ($percentage && $product->is_on_sale()) { ?>
+                <div>
+                  <span class="bg-amarelo text-white rounded-sm text-sm px-1 py-px sm:px-2 sm:py-1 font-roboto">
+                    <?php echo '-' . $percentage ?>%
+                  </span>
+                </div>
+              <?php } ?>
+            </div>
+          </div>
+          <div class="order-3 lg:order-3">
+            <?php if ($pre_venda_ativo): ?>
+              <div class="uppercase font-roboto text-xs text-amarelo text-left py-4 ">
+                <?php echo $pre_venda_mensagem ?>
+              </div>
 
-        ?>
+            <?php endif; ?>
+            <?php if ($percentage && $percentage > 0 && $product->is_on_sale() && isset($mensagem_promocional)): ?>
+              <div class="uppercase font-roboto text-xs text-amarelo text-left py-4 ">
+                <?php echo $mensagem_promocional; ?>
+              </div>
+              <?php
+            endif; ?>
+          </div>
+          <?php
+          if ($product->get_type() === "variable") { ?>
+            <div class="mt-6 order-4 lg:order-5">
+              <?php get_template_part('woocommerce/single-product/add-to-cart/variations', null, array('is_b2b' => $is_b2b)); ?>
+            </div>
+          <?php }
+          ?>
+          <?php get_template_part('woocommerce/single-product/add-to-cart/colors', null, array('is_b2b' => $is_b2b)); ?>
+          <div class="pt-0 lg:pt-8 order-7 lg:order-7">
+            <?php get_template_part('woocommerce/single-product/add-to-cart/descricao-composicao', null, array('is_b2b' => $is_b2b)); ?>
+          </div>
+          <div class="pt-8 lg:pt-6 order-8 lg:order-8">
+            <?php
+            if ($product->get_type() === "simple") {
+              get_template_part('woocommerce/single-product/add-to-cart/simple', null, array('is_b2b' => $is_b2b));
+            } elseif ($product->get_type() === "variable") {
+              get_template_part('woocommerce/single-product/add-to-cart/variable', null, array('is_b2b' => $is_b2b));
+            }
+            ?>
+          </div>
+          <div class="pt-4 lg:pt-8 order-5 lg:order-9">
+            <?php get_template_part('woocommerce/single-product/add-to-cart/entregas-devolucoes', null, array('is_b2b' => $is_b2b)); ?>
+          </div>
+        </div>
       </div>
-      <?php
-        if ($product->get_type() === "simple") {
-            get_template_part('woocommerce/single-product/add-to-cart/simple');
-        } elseif ($product->get_type() === "variable") {
-            get_template_part('woocommerce/single-product/add-to-cart/variable');
-        }
-        ?>
     </div>
     <div class="mt-8">
       <ul
@@ -187,75 +200,28 @@ if (count($colors) > 0) {
     </div>
     <?php if ($collection_gallery) { ?>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 relative mt-8">
-        <?php if (count($collection_gallery) == 2) : ?>
-            <?php foreach ($collection_gallery as $key => $item): ?>
+        <?php if (count($collection_gallery) == 2): ?>
+          <?php foreach ($collection_gallery as $key => $item): ?>
             <div class="w-full aspect-[10/15] relative">
               <img src="<?php echo $item; ?>" class="img-fill" alt="<?php echo $product->get_name(); ?>" />
             </div>
-            <?php endforeach; ?>
+          <?php endforeach; ?>
         <?php else: ?>
-            <?php foreach ($collection_gallery as $key => $item): ?>
+          <?php foreach ($collection_gallery as $key => $item): ?>
             <div
               class="<?php echo ($key == 0) ? 'md:col-span-2 aspect-[1.6/1]' : 'col-span-1 aspect-[1/1.6]'; ?> w-full  relative">
               <img src="<?php echo $item; ?>" class="img-fill" alt="<?php echo $product->get_name(); ?>" />
             </div>
-            <?php endforeach; ?>
+          <?php endforeach; ?>
         <?php endif; ?>
       </div>
     <?php } ?>
-    <div>
-      <div class="mx-auto max-w-2xl w-full mt-8">
-        <ul class="w-full relative">
-          <li class="w-full border-b border-gray-400 py-2 px-2 md:px-4">
-            <button data-target="acordeao_0_descricao"
-              class="btn-acordeao w-full flex justify-between items-center font-roboto uppercase text-xl py-2">
-              Descrição do Produto
-              <div class="is_open hidden">
-                <img width="15" src="<?php echo get_theme_file_uri('/assets/images/minus.webp') ?>" />
-              </div>
-              <div class="is_close">
-                <img width="15" src="<?php echo get_theme_file_uri('/assets/images/add.webp') ?>" />
-              </div>
-            </button>
-            <div id="acordeao_0_descricao" class="transition-all duration-300 font-garamond h-0 overflow-hidden">
-              <?php echo $product->get_description(); ?>
-            </div>
-          </li>
-          <li class="w-full border-b border-gray-400 py-2 px-2 md:px-4">
-            <button data-target="acordeao_1_cuidados"
-              class="btn-acordeao w-full flex justify-between items-center font-roboto uppercase text-xl py-2">
-              Cuidados
-              <div class="is_open hidden">
-                <img width="15" src="<?php echo get_theme_file_uri('/assets/images/minus.webp') ?>" />
-              </div>
-              <div class="is_close">
-                <img width="15" src="<?php echo get_theme_file_uri('/assets/images/add.webp') ?>" />
-              </div>
-            </button>
-            <div id="acordeao_1_cuidados" class="transition-all duration-300 font-garamond h-0 overflow-hidden">
-              <?php if ($care) { ?>
-                <ul class="grid grid-cols-1 gap-2 pt-4">
-                    <?php foreach ($care as $careItem) { ?>
-                    <li class="flex items-start space-x-4 justify-start">
-                      <div class="relative w-6 h-6 flex-none">
-                        <img width="24" src="<?php echo get_theme_file_uri('/assets/images/' . $careIndex[$careItem]) ?>" />
-                      </div>
 
-                      <span
-                        class="font-garamond text-sm border-b border-b-transparent mb-2 font-light transition-all duration-200 leading-loose relative">
-                        <?php echo $careItem ?>
-                      </span>
-                    </li>
-                    <?php } ?>
-                </ul>
-              <?php } ?>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
+  </div>
+  </div>
 </section>
-<section class="px-4 md:px-6 ">
+
+<section class="px-4 md:px-6">
   <?php get_template_part('woocommerce/single-product/related'); ?>
 </section>
 <?php do_action('woocommerce_after_single_product'); ?>

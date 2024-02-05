@@ -47,6 +47,8 @@ do_action('woocommerce_email_header', $email_heading, $email); ?>
 			echo 'Correos Express';
 		elseif ($shipping_company === 'ctt'):
 			echo 'CTT';
+		elseif ($shipping_company === 'ups'):
+			echo 'UPS';
 		endif; ?>
 		<br />
 		<b>
@@ -57,6 +59,26 @@ do_action('woocommerce_email_header', $email_heading, $email); ?>
 		<div style="text-align:center; padding-bottom:2rem;">
 			<a href="https://appserver.ctt.pt/CustomerArea/PublicArea_Detail?IsFromPublicArea=true&ObjectCodeInput=<?= $tracking_code ?>&SearchInput=<?= $tracking_code ?>"
 				target="_blank" style="
+														text-decoration: none;
+														padding: 12px 45px;
+														width: 210px;
+														height: 48px;
+														border: none;
+														border-radius: 0px;
+														background-color: #000;
+														border: 1px solid #000;
+														font-weight: 500;
+														color: #fff;
+														font-family: 'Inter', Arial,
+															sans-serif;
+																							">
+				Seguir Encomenda
+			</a>
+		</div>
+	<?php endif;
+	if ($shipping_company === 'ups'): ?>
+		<div style="text-align:center; padding-bottom:2rem;">
+			<a href="https://www.ups.com/track?loc=pt_PT&requester=ST&trackingNumber=<?= $tracking_code ?>" target="_blank" style="
 														text-decoration: none;
 														padding: 12px 45px;
 														width: 210px;

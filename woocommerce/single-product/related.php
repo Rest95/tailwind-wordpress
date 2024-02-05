@@ -54,17 +54,17 @@ if ($related_products): ?>
 			</h2>
 		</div>
 
-		<ul class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+		<ul class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6 lg:mt-12">
 			<?php foreach ($related_products as $related_product): ?>
 				<?php
 				$post_object = get_post($related_product->get_id());
-				setup_postdata($GLOBALS['post'] = & $post_object); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited, Squiz.PHP.DisallowMultipleAssignments.Found
+				setup_postdata($GLOBALS['post'] = &$post_object); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited, Squiz.PHP.DisallowMultipleAssignments.Found
 				wc_get_template_part('content', 'product');
 				?>
 			<?php endforeach; ?>
 		</ul>
 	</section>
-<?php
+	<?php
 endif;
 
 wp_reset_postdata();

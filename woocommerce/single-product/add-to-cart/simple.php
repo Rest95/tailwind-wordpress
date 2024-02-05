@@ -12,7 +12,7 @@
  *
  * @see     https://docs.woocommerce.com/document/template-structure/
  * @package WooCommerce\Templates
- * @version 3.4.0
+ * @version 7.0.1
  */
 
 defined('ABSPATH') || exit;
@@ -24,85 +24,28 @@ if (!$product->is_purchasable()) {
     return;
 }
 
-echo wc_get_stock_html($product); // WPCS: XSS ok.
+do_action('woocommerce_before_add_to_cart_form'); ?>
 
-$percentage = 0;
-if ($product->is_type('simple')) { //if simple product
-    if ($product->sale_price) {
-        $percentage = round(((floatval($product->regular_price) - floatval($product->sale_price)) / floatval($product->regular_price)) * 100);
-    }
-} else { //if variable product
-    $percentage = apply_filters('get_variable_sale_percentage', $product);
-}
+<?php if (!$product->is_in_stock()) { ?>
+    <div>
+        <span class="bg-secondary text-white px-2 py-1 uppercase text-xs">Esgotado</span>
+    </div>
+<?php } ?>
 
-$pre_venda_ativo = get_field('pre_venda_ativo', $product->get_id());
-$pre_venda_mensagem = get_field('pre_venda_mensagem', $product->get_id());
-
-$mensagem_promo = get_field("mensagem_promo", "option");
+<form class="cart flex flex-col space-y-4"
+    action="<?php echo esc_url(apply_filters('woocommerce_add_to_cart_form_action', $product->get_permalink())); ?>"
+    method="post" enctype='multipart/form-data'>
 
 
-if($product->is_in_stock()) : ?>
-
-    <?php do_action('woocommerce_before_add_to_cart_form'); ?>
-
-    <form class="cart flex space-x-4"
-        action="<?php echo esc_url(apply_filters('woocommerce_add_to_cart_form_action', $product->get_permalink())); ?>"
-        method="post" enctype='multipart/form-data'>
     <?php do_action('woocommerce_before_add_to_cart_button'); ?>
-
-    <?php
-    // do_action('woocommerce_before_add_to_cart_quantity');
-    
-    // woocommerce_quantity_input(
-    //     array(
-    //         'input_class' => 'qty',
-    //         'min_value' => apply_filters('woocommerce_quantity_input_min', $product->get_min_purchase_quantity(), $product),
-    //         'max_value' => apply_filters('woocommerce_quantity_input_max', $product->get_max_purchase_quantity(), $product),
-    //         'input_value' => isset($_POST['quantity']) ? wc_stock_amount(wp_unslash($_POST['quantity'])) : $product->get_min_purchase_quantity(),
-    //         // WPCS: CSRF ok, input var ok.
-    //     )
-    // );
-    
-  // do_action('woocommerce_after_add_to_cart_quantity');
-    ?>
-
-        <div class="flex justify-between mt-8 pt-4 border-t-gray-400 border-t w-full">
-            <div class="flex w-full justify-between items-center ">
-                <div class="flex w-full items-center">
-                    <div class="text-secondary price-box uppercase text-center font-roboto text-2xl">
-                        <?php echo $product->get_price_html(); ?>
-                    </div>
-                    <?php if ($percentage && $product->is_on_sale()) { ?>
-                        <div>
-                            <span class="bg-amarelo text-white rounded-sm text-sm px-1 py-px sm:px-2 sm:py-1 font-roboto">
-                        <?php echo '-' . $percentage ?>%
-                            </span>
-                        </div>
-                    <?php } ?>
-                </div>
-            </div>
-            <button type="submit" name="add-to-cart" value="<?php echo esc_attr($product->get_id()); ?>"
-                class="single_add_to_cart_button btn btn-primary">
-                <?php echo _e("Adicionar", "wlb_theme") ?></button>
-        </div>
-
-
-
+    <div class="flex justify-between pt-4 lg:pt-6 pb-8 w-full">
+        <button type="submit" name="add-to-cart" value="<?php echo esc_attr($product->get_id()); ?>"
+            class="single_add_to_cart_button btn btn-primary w-full justify-center disabled:opacity-40" <?php echo !$product->is_in_stock() ? 'disabled' : '' ?>>
+            <?php echo _e("Adicionar ao carrinho", "wlb_theme") ?>
+        </button>
+    </div>
     <?php do_action('woocommerce_after_add_to_cart_button'); ?>
-    </form>
-    <?php if ($pre_venda_ativo) : ?>
-        <div class="uppercase font-roboto text-xs text-amarelo text-center py-4">
-        <?php echo $pre_venda_mensagem ?>
-        </div>
 
-    <?php endif; ?>
-    <?php if ($percentage && $percentage > 0 && $product->is_on_sale()) : ?>
-        <div class="uppercase font-roboto text-xs text-amarelo text-center py-4">
-          <?php echo $mensagem_promo; ?>
-        </div>
-        <?php 
-    endif; ?>
+</form>
 
-    <?php do_action('woocommerce_after_add_to_cart_form'); ?>
-
-<?php endif; ?>
+<?php do_action('woocommerce_after_add_to_cart_form'); ?>

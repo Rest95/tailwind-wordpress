@@ -359,3 +359,21 @@ input[type="number"] {
 #lightbox.opened {
   @apply opacity-100 visible pointer-events-auto scale-100;
 }
+
+figure.zoom {
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-size: 0%;
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  cursor: zoom-in;
+}
+
+figure.zoom img:hover {
+  @apply opacity-0;
+}
+
+figure.zoom img {
+  @apply transition-opacity duration-200 ease-in-out;
+}

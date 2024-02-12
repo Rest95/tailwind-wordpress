@@ -23,41 +23,20 @@ foreach ($gallery as $image) {
   array_push($gallery_final, $item);
 }
 ?>
-<div class="relative aspect-[720/860] flex items-center h-full ">
-  <div class="swiper swipper-vertical w-full h-full">
-    <div class="swiper-wrapper ">
-      <?php foreach ($gallery_final as $key => $gallery_item) { ?>
-        <div class="swiper-slide h-full trigger-lightbox" data-current_index="<?php echo $key ?>" data-slide_type="
-          <?php echo $gallery_item->type ?>">
-          <?php if ($gallery_item->type === "image") { ?>
-            <img loading="lazy" src="<?php echo $gallery_item->url_full ?>"
-              class="w-full h-full object-contain top-0 left-0 absolute" alt="banner <?php echo $key ?>" />
-          <?php } else if ($gallery_item->type === "video") {
-            $extension = pathinfo($gallery_item->url, PATHINFO_EXTENSION);
-            ?>
-              <video class="w-full h-full object-cover top-0 left-0 absolute" data-html5-video muted="true" preload="metadata"
-                playsinline="playsinline" loop autoplay>
-                <source src="<?php echo $gallery_item->url; ?>" type="video/mp4" />
-                <source src="<?php echo $gallery_item->url; ?>" type="video/webm" />
-              </video>
-          <?php } ?>
-        </div>
-      <?php } ?>
-    </div>
-  </div>
-  <div class="absolute left-12 h-[395px]">
+<div class="relative aspect-[720/860] flex flex-row items-center h-full gap-8 ">
+  <div class="h-full flex items-center">
     <div thumbsSlider="" class="swiper thumbsSwipper h-full">
       <div class="swiper-wrapper">
         <?php foreach ($gallery_final as $key => $gallery_item) { ?>
-          <div class="swiper-slide w-16 border border-black bg-white" data-slide_type="<?php echo $gallery_item->type ?>">
+          <div class="swiper-slide w-16 h-24 border bg-[#efefef]" data-slide_type="<?php echo $gallery_item->type ?>">
             <?php if ($gallery_item->type === "image") { ?>
               <img loading="lazy" src="<?php echo $gallery_item->url_full ?>"
-                class="w-full h-full object-contain top-0 left-0 absolute" alt="banner <?php echo $key ?>" />
+                class="w-full h-full object-contain top-0 left-0 absolute select-none" alt="banner <?php echo $key ?>" />
             <?php } else if ($gallery_item->type === "video") {
               $extension = pathinfo($gallery_item->url, PATHINFO_EXTENSION);
               ?>
-                <div class="h-full relative">
-                  <div class="bg-cacaca flex justify-center items-center h-full absolute w-full z-[1]">
+                <div class="h-full relative select-none">
+                  <div class="bg-[#efefef] flex justify-center items-center h-full absolute w-full z-[1] ">
                     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <g clip-path="url(#clip0_226_458)">
                         <path
@@ -78,6 +57,28 @@ foreach ($gallery as $image) {
       </div>
     </div>
   </div>
+  <div class="swiper swipper-vertical w-full h-full bg-[#efefef]">
+    <div class="swiper-wrapper ">
+      <?php foreach ($gallery_final as $key => $gallery_item) { ?>
+        <div class="swiper-slide h-full trigger-lightbox" data-current_index="<?php echo $key ?>" data-slide_type="
+          <?php echo $gallery_item->type ?>">
+          <?php if ($gallery_item->type === "image") { ?>
+            <img loading="lazy" src="<?php echo $gallery_item->url_full ?>"
+              class="w-full h-full object-contain top-0 left-0 absolute" alt="banner <?php echo $key ?>" />
+          <?php } else if ($gallery_item->type === "video") {
+            $extension = pathinfo($gallery_item->url, PATHINFO_EXTENSION);
+            ?>
+              <video class="w-full h-full object-cover top-0 left-0 absolute" data-html5-video muted="true" preload="metadata"
+                playsinline="playsinline" loop autoplay>
+                <source src="<?php echo $gallery_item->url; ?>" type="video/mp4" />
+                <source src="<?php echo $gallery_item->url; ?>" type="video/webm" />
+              </video>
+          <?php } ?>
+        </div>
+      <?php } ?>
+    </div>
+  </div>
+
 
   <div id="lightbox" data-current_index="0">
     <div class="fixed top-0 left-0 w-full h-screen bg-white z-[99999]">
@@ -141,10 +142,11 @@ foreach ($gallery as $image) {
   <script>
     let swiper = new Swiper(".thumbsSwipper", {
       spaceBetween: 10,
-      slidesPerView: 4,
-      freeMode: true,
+      slidesPerView: "auto",
       watchSlidesProgress: true,
       direction: "vertical",
+      centeredSlides: true,
+      allowTouchMove: false,
     });
 
     let swiper2 = new Swiper(".swipper-vertical", {

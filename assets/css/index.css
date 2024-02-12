@@ -377,3 +377,7 @@ figure.zoom img:hover {
 figure.zoom img {
   @apply transition-opacity duration-200 ease-in-out;
 }
+
+.thumbsSwipper .swiper-slide-thumb-active {
+  @apply border-black;
+}

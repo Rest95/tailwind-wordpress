@@ -614,6 +614,13 @@ jQuery(document).ready(function ($) {
   var woocommerce_form = $(".woocommerce-cart form");
   woocommerce_form
     .on("change", ".qty", function () {
+      let max = $(this).attr("max");
+      let value = $(this).val();
+
+      if (parseInt(value) > parseInt(max)) {
+        $(this).val(max);
+      }
+
       form = $(this).closest("form");
       $(
         "<input type='hidden' name='update_cart' id='update_cart' value='1'>"
@@ -673,9 +680,9 @@ jQuery(document).ready(function ($) {
       const input = btn.currentTarget.parentElement.querySelector(
         "input.qty[type='number']"
       );
-
+      let current = 0;
       if (parseInt(input.value) > 1) {
-        let current = parseInt(input.value) - 1;
+        current = parseInt(input.value) - 1;
         $(this).next(".qty").val(current).trigger("change");
       }
     })
@@ -685,13 +692,14 @@ jQuery(document).ready(function ($) {
         "input.qty[type='number']"
       );
       let max = input.max;
+      let current = 0;
       if (max) {
-        let current = parseInt(input.value) + 1;
+        current = parseInt(input.value) + 1;
         if (current > max) {
           return;
         }
+        $(this).prev(".qty").val(current).trigger("change");
       }
-      $(this).prev(".qty").val(current).trigger("change");
     });
 
   $(".woocommerce-cart").on(

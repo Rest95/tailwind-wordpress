@@ -41,6 +41,7 @@ $mensagem_promo = get_field("mensagem_promo", "option");
 $pre_venda_ativo = get_field('pre_venda_ativo', $product->get_id());
 $pre_venda_mensagem = get_field('pre_venda_mensagem', $product->get_id());
 
+$mensagem_promo = get_field("mensagem_promo", "option");
 $mensagem_promocional = get_field('mensagem_promocional', $product->get_id());
 
 $collection_gallery = get_field('collection_gallery', $id);
@@ -64,14 +65,14 @@ $gamas = wp_get_post_terms($id, array('gamas'), array("fields" => "names"));
   <div id="product-<?php the_ID(); ?>" <?php wc_product_class('', $product); ?>>
     <div class="grid grid-cols-1 lg:grid-cols-[1fr_1fr]">
       <div>
-        <div class="hidden lg:block h-auto overflow-hidden bg-[#efefef]">
+        <div class="hidden lg:block h-auto overflow-hidden">
           <?php get_template_part('woocommerce/single-product/product-gallery-desktop'); ?>
         </div>
         <div class="block lg:hidden h-[400px]">
           <?php get_template_part('woocommerce/single-product/product-image-gallery'); ?>
         </div>
       </div>
-      <div class="py-4 lg:py-12 lg:px-4 lg:pl-40 relative">
+      <div class="py-4 lg:py-12 lg:px-4 lg:pl-32 relative">
         <div class="flex flex-col max-w-[545px] sticky top-[170px]">
           <div class="flex flex-row justify-start space-x-2 order-2 lg:order-1 mt-4 lg:mt-0">
             <?php if (has_term('hunny', 'marca', $id)) { ?>
@@ -138,13 +139,19 @@ $gamas = wp_get_post_terms($id, array('gamas'), array("fields" => "names"));
               <div class="uppercase font-roboto text-xs text-amarelo text-left py-4 ">
                 <?php echo $pre_venda_mensagem ?>
               </div>
-
             <?php endif; ?>
-            <?php if ($percentage && $percentage > 0 && $product->is_on_sale() && isset($mensagem_promocional)): ?>
-              <div class="uppercase font-roboto text-xs text-amarelo text-left py-4 ">
-                <?php echo $mensagem_promocional; ?>
-              </div>
-              <?php
+            <?php if ($percentage && $percentage > 0 && $product->is_on_sale()):
+              if (isset($mensagem_promocional)): ?>
+                <div class="uppercase font-roboto text-xs text-amarelo text-left py-4 ">
+                  <?php echo $mensagem_promocional; ?>
+                </div>
+                <?php
+              elseif (isset($mensagem_promo)): ?>
+                <div class="uppercase font-roboto text-xs text-amarelo text-left py-4 ">
+                  <?php echo $mensagem_promo; ?>
+                </div>
+                <?php
+              endif;
             endif; ?>
           </div>
           <?php

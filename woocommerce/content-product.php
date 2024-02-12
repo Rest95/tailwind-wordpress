@@ -74,7 +74,7 @@ $gallery = $product->get_gallery_image_ids();
     
     ?>
 
-    <div class="relative w-full ">
+    <div class="relative w-full overflow-hidden">
         <div class="overflow-hidden aspect-productImg relative">
             <div
                 class="aspect-productImg absolute bg-[#efefef] w-full  <?php echo (count($gallery)) > 1 ? 'group-hover:opacity-0 transition-all duration-[350ms] ease-in-out' : '' ?>">
@@ -89,11 +89,9 @@ $gallery = $product->get_gallery_image_ids();
                 </div>
             <?php } ?>
         </div>
-    </div>
-    <div class="font-roboto relative z-10">
         <?php if ($product->get_type() == 'variable') { ?>
             <div
-                class="absolute w-full bg-white bg-opacity-50 left-0 py-2 justify-center item-center gap-2 -top-3 -translate-y-full hidden lg:flex">
+                class="absolute w-full bg-white bg-opacity-50 left-0 py-2 justify-center item-center gap-2 bottom-0  translate-y-full group-hover:translate-y-0 hidden lg:flex transition-all duration-200 ease-in-out ">
                 <?php foreach ($tempArray as $variation) { ?>
                     <div
                         class="text-xs xl:text-sm uppercase font-roboto <?php echo $variation->stock === 0 ? 'text-gray-400 line-through' : '' ?>">
@@ -110,6 +108,9 @@ $gallery = $product->get_gallery_image_ids();
                 </div>
             </div>
         <?php } ?>
+    </div>
+    <div class="font-roboto relative z-10">
+
 
         <h3 class="text-sm md:text-base uppercase text-left mb-1 mt-1">
             <?php echo $product->get_name() ?>

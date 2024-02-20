@@ -47,6 +47,97 @@
       document.body.style.paddingRight = "0rem";
     };
 
+    // variable
+    let VIDEO_MOBILE_PLAYING_STATE = {
+      PLAYING: "PLAYING",
+      PAUSE: "PAUSE",
+    };
+
+    let videoMobilePlayStatus = VIDEO_MOBILE_PLAYING_STATE.PAUSE;
+    let mobileTimeout = null;
+
+    let swiperMobile = new Swiper(".product-images-gallery", {
+      loop: true,
+      spaceBetween: 32,
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+    });
+
+    let mobilePlayer = document.getElementById("video-player-mobile");
+    if (mobilePlayer) {
+      const customHandler = () => {
+        let index = swiperMobile.activeIndex;
+        let currentSlide = swiperMobile.slides[index];
+        let currentSlideType = currentSlide.dataset.slide_type;
+
+        if (videoMobilePlayStatus === VIDEO_MOBILE_PLAYING_STATE.PLAYING) {
+          mobilePlayer.pause();
+        }
+
+        clearTimeout(mobileTimeout);
+
+        switch (currentSlideType) {
+          case "image":
+            break;
+          case "video":
+            mobilePlayer.currentTime = 0;
+            mobilePlayer.play();
+            videoMobilePlayStatus = VIDEO_MOBILE_PLAYING_STATE.PLAYING;
+            break;
+          default:
+            throw new Error("invalid slide type");
+        }
+      };
+
+      swiperMobile.on("slideChangeTransitionEnd", function () {
+        customHandler();
+      });
+    }
+
+    let slides = document.querySelectorAll(".zoom-mobile");
+
+    if (slides.length > 0) {
+      slides.forEach((slide) => {
+        slide.addEventListener("click", (e) => {
+          let zoomer = e.srcElement.parentElement;
+          if (zoomer.classList.contains("touched")) {
+            zoomer.classList.remove("touched");
+            swiperMobile.attachEvents();
+            enableScroll();
+            zoomer.style.backgroundSize = "0%";
+            e.srcElement.style.opacity = 1;
+          } else {
+            swiperMobile.detachEvents();
+            e.srcElement.style.opacity = 0;
+            zoomer.classList.add("touched");
+            zoomer.style.backgroundSize = "340%";
+            zoomer.style.width = "100%";
+          }
+        });
+
+        slide.addEventListener("touchmove", (e) => {
+          let zoomer = e.srcElement.parentElement;
+          if (zoomer.classList.contains("touched")) {
+            disableScroll();
+            swiperMobile.detachEvents();
+
+            zoomer.style.backgroundSize = "340%";
+            zoomer.style.width = "100%";
+
+            let offsetX = e.touches[0].pageX;
+            let offsetY = e.touches[0].pageY;
+
+            let x = (offsetX / zoomer.offsetWidth) * 100;
+            let y = (offsetY / zoomer.offsetHeight) * 100;
+
+            zoomer.style.backgroundPosition = x + "% " + y + "%";
+          }
+        });
+      });
+    }
+
     const closeCart = () => {
       domElements.floatingCart.style.visibility = "hidden";
       domElements.floatingCart.children[0].style.opacity = "0";

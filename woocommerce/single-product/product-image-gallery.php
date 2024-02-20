@@ -64,8 +64,9 @@ if ($video) {
         <div class="swiper-slide woocommerce-product-gallery__trigger slider-product-image relative"
           data-slide_type="<?php echo $image->type ?>">
           <?php if ($image->type === "image") { ?>
-            <img loading="lazy" src="<?php echo $image->url ?>" alt="<?php echo $product->get_name() ?>" width="400"
-              class="img-fit" />
+            <figure class="zoom zoom-mobile" style="background-image: url(<?php echo $image->url ?>)">
+              <img class="w-full h-full object-contain" loading="lazy" src="<?php echo $image->url ?>" />
+            </figure>
           <?php } else if ($image->type === "video") {
             $extension = pathinfo($image->url, PATHINFO_EXTENSION);
             ?>
@@ -75,7 +76,7 @@ if ($video) {
                 <source src="<?php echo $video; ?>" type="video/webm" />
               </video>
               <script>
-                // loadVideoBuffer(document.getElementById("video-player-mobile"), '<?php //echo $image->url ?>');
+                // loadVideoBuffer(document.getElementById("video-player-mobile"), '<?php //echo $image->url   ?>');
               </script>
           <?php } ?>
         </div>
@@ -103,77 +104,3 @@ if ($video) {
     <?php } ?>
   </div>
 </div>
-
-<script>
-
-  // variable 
-  let VIDEO_MOBILE_PLAYING_STATE = {
-    "PLAYING": "PLAYING",
-    "PAUSE": "PAUSE"
-  }
-
-  let videoMobilePlayStatus = VIDEO_MOBILE_PLAYING_STATE.PAUSE
-  let mobileTimeout = null
-  let delay = 3000
-
-  let swiperMobile = new Swiper(
-    '.product-images-gallery', {
-    loop: <?php echo count($gallery_final) > 1 ? 'true' : 'false' ?>,
-    spaceBetween: 32,
-    navigation: {
-      nextEl: ".swiper-button-next",
-      prevEl: ".swiper-button-prev",
-    },
-  });
-
-
-  let mobilePlayer = document.getElementById('video-player-mobile');
-  if (mobilePlayer) {
-    mobilePlayer.addEventListener('ended', () => {
-      next()
-    })
-
-    // swiper object
-    swiperMobile.on('slideChangeTransitionEnd', function () {
-      let index = swiperMobile.activeIndex
-      let currentSlide = swiperMobile.slides[index]
-      let currentSlideType = currentSlide.dataset.slide_type;
-
-      if (videoMobilePlayStatus === VIDEO_MOBILE_PLAYING_STATE.PLAYING) {
-        mobilePlayer.pause()
-      }
-
-      clearTimeout(mobileTimeout)
-
-      switch (currentSlideType) {
-        case 'image':
-          runNext()
-          break;
-        case 'video':
-          mobilePlayer.currentTime = 0;
-          mobilePlayer.play()
-          videoMobilePlayStatus = VIDEO_MOBILE_PLAYING_STATE.PLAYING
-          break;
-        default:
-          throw new Error('invalid slide type');
-      }
-    })
-
-    function prev() {
-      swiperMobile.slidePrev();
-    }
-
-    function next() {
-      swiperMobile.slideNext();
-    }
-
-    function runNext() {
-      mobileTimeout = setTimeout(function () {
-        next()
-      }, delay)
-    }
-
-    runNext()
-  }
-
-</script>

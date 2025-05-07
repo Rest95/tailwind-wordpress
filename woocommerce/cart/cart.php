@@ -111,7 +111,7 @@ do_action('woocommerce_before_cart'); ?>
 									?>
 								</div>
 								<div class="price-product md:block flex flex-col text-sm text-right lg:text-left">
-									<?php if ($_product->get_sale_price()) {
+									<?php if ($_product->get_sale_price() && $_product->is_on_sale()) {
 
 										$percentage = 0;
 										if ($_product->get_sale_price()) {

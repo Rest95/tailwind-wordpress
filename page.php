@@ -37,6 +37,9 @@
             if (get_row_layout() == 'grid_texto_img_btn'):
                 get_template_part('template-parts/layout/blocks/grid_texto_img_btn', 'grid_texto_img_btn', array('index' => $index));
             endif;
+            if (get_row_layout() == 'grid_texto_img_btn_b'):
+                get_template_part('template-parts/layout/blocks/grid_texto_img_btn_b', 'grid_texto_img_btn_b', array('index' => $index));
+            endif;
             if (get_row_layout() == 'grid_masonry'):
                 get_template_part('template-parts/layout/blocks/grid_masonry', 'grid_masonry', array('index' => $index));
             endif;
@@ -57,6 +60,15 @@
             endif;
             if (get_row_layout() == 'cta_categorias'):
                 get_template_part('template-parts/layout/blocks/cta_categorias', 'cta_categorias', array('index' => $index));
+            endif;
+            if (get_row_layout() == 'newsletter'):
+                get_template_part('template-parts/layout/blocks/newsletter', 'newsletter', array('index' => $index));
+            endif;
+            if (get_row_layout() == 'product_card_olympic_games'):
+                get_template_part('template-parts/layout/blocks/product_card_olympic_games', 'product_card_olympic_games', array('index' => $index));
+            endif;
+            if (get_row_layout() == 'titulo_de_pagina'):
+                get_template_part('template-parts/layout/blocks/titulo_de_pagina', 'titulo_de_pagina', array('index' => $index));
             endif;
             $index++;
         endwhile;

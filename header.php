@@ -1,6 +1,7 @@
 <?php
 global $woocommerce;
 $icons = new Icons();
+$logo_mobile = get_field("logo_mobile", "option");
 ?>
 
 <!DOCTYPE html>
@@ -51,7 +52,12 @@ $icons = new Icons();
       </div>
       <div class="flex-1 flex justify-center">
         <a href="<?php echo site_url() ?>" aria-label="Pacto.cc">
-          <img src="<?php echo get_theme_file_uri('assets/images/logo_pacto.svg') ?>" width="120" />
+          <?php if ($logo_mobile): ?>
+            <img src="<?php echo get_theme_file_uri('assets/images/logo_pacto.svg') ?>" width="120" class="hidden lg:block" />
+            <img src="<?= $logo_mobile ?>" width="36" class="block lg:hidden" />
+          <?php else: ?>
+            <img src="<?php echo get_theme_file_uri('assets/images/logo_pacto.svg') ?>" width="120" />
+          <?php endif; ?>
         </a>
       </div>
       <div class="flex gap-4 md:gap-6 justify-self-end">
@@ -64,7 +70,7 @@ $icons = new Icons();
         <div class="shopping-bag icons w-6 h-6 mr-[10px]">
           <button class="open-floating-cart shop-cart relative cursor-pointer">
             <div class="w-4 h-4 relative">
-              <img src="<?php echo get_theme_file_uri('assets/images/bag.webp'); ?>" class="object-contain"/>
+              <img src="<?php echo get_theme_file_uri('assets/images/bag.webp'); ?>" class="object-contain" />
             </div>
             <span
               class="shop-cart-counter absolute top-[-10px] right-[-10px] bg-primary text-white p-[10px] text-xs rounded-full w-4 h-4 flex justify-center items-center">

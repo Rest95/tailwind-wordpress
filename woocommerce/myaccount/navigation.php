@@ -38,6 +38,8 @@ $labelsArr = array(
 <nav class="woocommerce-MyAccount-navigation font-roboto">
 	<ul class="flex flex-col  md:space-y-4">
 		<?php foreach (wc_get_account_menu_items() as $endpoint => $label):
+			if ($endpoint === 'payment-methods')
+				continue;
 			?>
 			<li class="uppercase text-base md:text-xl font-normal <?php echo wc_get_account_menu_item_classes($endpoint); ?>">
 				<a class="hover:text-secondary transition-all duration-200"

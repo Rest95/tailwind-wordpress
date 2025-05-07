@@ -207,24 +207,27 @@ if (!function_exists('theme_woocommerce_floating_cart')) {
                         $product_thumbnail = wp_get_attachment_image_src($post_thumbnail_id, $size = 'shop-feature');
                         $product_thumbnail_alt = get_post_meta($post_thumbnail_id, '_wp_attachment_image_alt', true);
                         $percentage = 0;
-                        $show_preco = $product->regular_price;
-                        if ($product->sale_price) {
-                            $percentage = round(((floatval($product->regular_price) - floatval($product->sale_price)) / floatval($product->regular_price)) * 100);
-                            $show_preco = $product->sale_price;
+                        $show_preco = $product->get_regular_price();
+                        if ($product->get_sale_price() && $product->is_on_sale()) {
+                            $percentage = round(((floatval($product->get_regular_price()) - floatval($product->get_sale_price())) / floatval($product->get_regular_price())) * 100);
+                            $show_preco = $product->get_sale_price();
                         }
                         ?>
                         <div class="cart-product grid grid-cols-[auto_124px_1fr] border-b-[1px] py-4">
                             <div class="flex items-center justify-center flex-none">
                                 <button class="remove_item_from_cart cursor-pointer w-4 h-4" data-product_id="<?php echo $cart_item_key;
                                 ?>">
-                                    <?php echo $icons->get_icon('GrClose'); ?></button>
+                                    <?php echo $icons->get_icon('GrClose'); ?>
+                                </button>
                             </div>
                             <div class="cart-product-image w-[124px]">
                                 <img src="<?php echo $product_thumbnail[0]; ?>" alt="<?php echo $product_thumbnail_alt; ?>">
                             </div>
                             <div class="cart-product-info flex flex-col justify-between">
                                 <div class="cart-product-info-name text-sm mt-8 flex flex-col justify-start items-start">
-                                    <a href="<?php echo get_permalink($product_id) ?>" class="name font-roboto  uppercase"><?php echo $product->get_name(); ?></a>
+                                    <a href="<?php echo get_permalink($product_id) ?>" class="name font-roboto  uppercase">
+                                        <?php echo $product->get_name(); ?>
+                                    </a>
                                     <?php if ($percentage > 0): ?>
                                         <div>
                                             <div class="bg-amarelo text-white rounded-sm text-sm px-1 py-px sm:px-2 sm:py-1 font-roboto">
@@ -260,10 +263,14 @@ if (!function_exists('theme_woocommerce_floating_cart')) {
                     </h4>
                     <div class="text-sm font-roboto">Custo de portes + Taxas calculadas no checkout</div>
                     <div class="grid grid-cols-2 gap-4 w-full bg-white py-4 lg:py-8  ">
-                        <a href="<?php echo wc_get_cart_url() ?>" class="text-sm btn btn-outline flex justify-center"><?php echo
-                               _e("Ver carrinho", "wlb_theme") ?></a>
-                        <a href="<?php echo wc_get_checkout_url() ?>" class="text-sm btn btn-primary flex justify-center"><?php echo
-                               _e("Finalizar", "wlb_theme") ?></a>
+                        <a href="<?php echo wc_get_cart_url() ?>" class="text-sm btn btn-outline flex justify-center">
+                            <?php echo
+                                _e("Ver carrinho", "wlb_theme") ?>
+                        </a>
+                        <a href="<?php echo wc_get_checkout_url() ?>" class="text-sm btn btn-primary flex justify-center">
+                            <?php echo
+                                _e("Finalizar", "wlb_theme") ?>
+                        </a>
                     </div>
                 </div>
             <?php } else { ?>
@@ -511,6 +518,13 @@ function woocommerce_ajax_filter_products()
         'orderby' => 'menu_order title',
         'order' => 'ASC',
         'tax_query' => array(),
+        'meta_query' => array(
+            array(
+                'key' => '_stock_status',
+                'value' => 'outofstock',
+                'compare' => '!='
+            )
+        )
     );
 
     foreach ($params as $value) {
@@ -595,7 +609,7 @@ function woocommerce_ajax_filter_products()
                     'stock_status' => 'outofstock'
                 )
             );
-            var_dump($new_args);
+            //var_dump($new_args);
         }
     }
 
@@ -807,7 +821,9 @@ function woocommerce_ajax_rerender_filters()
                     <?php } ?>
                 </ul>
                 <button class="clear-all-filters text-sm text-secondary"
-                    data-taxonomy="<?php echo isset($taxonomy) ? $taxonomy : '' ?>">Limpar tudo (<?php echo count($new_args) ?>)</button>
+                    data-taxonomy="<?php echo isset($taxonomy) ? $taxonomy : '' ?>">Limpar tudo (
+                    <?php echo count($new_args) ?>)
+                </button>
             </div>
             <?php
         }
@@ -837,7 +853,8 @@ function woocommerce_ajax_rerender_filters()
                                     ?>>
                             </div>
                             <label class="text-sm" for="<?php echo $attribute['slug'] . '_' . $term->slug ?>">
-                                <?php echo $term->name ?> (<?php echo $term->count ?>)
+                                <?php echo $term->name ?> (
+                                <?php echo $term->count ?>)
                             </label>
                         </li>
                     <?php } ?>
@@ -869,7 +886,7 @@ function search_products()
                 'post_type' => 'product',
                 'orderby' => 'ID',
                 'sort_order' => 'asc',
-                'posts_per_page' => 6,
+                'posts_per_page' => 12,
                 'product_cat' => $searchTerm[0]->slug
             )
         );
@@ -927,7 +944,13 @@ function search_products()
 			ean 
 		LIKE 
 			'%s'  
-		ORDER BY ID DESC LIMIT 6;", '%' . $wpdb->esc_like($keyword) . '%', '%' . $wpdb->esc_like($keyword) . '%', '%' . $wpdb->esc_like($keyword) . '%', '%' . $wpdb->esc_like($keyword) . '%', '%' . $wpdb->esc_like($keyword) . '%', '%' . $wpdb->esc_like($keyword) . '%'
+		ORDER BY ID DESC LIMIT 6;",
+                '%' . $wpdb->esc_like($keyword) . '%',
+                '%' . $wpdb->esc_like($keyword) . '%',
+                '%' . $wpdb->esc_like($keyword) . '%',
+                '%' . $wpdb->esc_like($keyword) . '%',
+                '%' . $wpdb->esc_like($keyword) . '%',
+                '%' . $wpdb->esc_like($keyword) . '%'
             )
         );
     }
@@ -935,7 +958,7 @@ function search_products()
     if (count($post_list) === 0) {
         $post_list = get_posts(
             array(
-                'numberposts' => 6,
+                'numberposts' => 12,
                 'post_type' => 'product',
                 'meta_query' => array(
                     'relation' => 'OR',
@@ -949,6 +972,7 @@ function search_products()
                         'value' => $wpdb->esc_like($keyword),
                         'compare' => 'LIKE',
                     ),
+
                 ),
             )
         );
@@ -1132,6 +1156,13 @@ function get_variable_sale_percentage($product)
     $variation_min_sale_price = $product->get_variation_sale_price('min', true);
     $variation_max_sale_price = $product->get_variation_sale_price('max', true);
 
+    if ($variation_min_regular_price == 0) {
+        $variation_min_regular_price = 1;
+    }
+    if ($variation_max_regular_price == 0) {
+        $variation_max_regular_price = 1;
+    }
+
     //get highest and lowest percentages
     $lower_percentage = round((($variation_min_regular_price - $variation_min_sale_price) / $variation_min_regular_price) * 100);
     $higher_percentage = round((($variation_max_regular_price - $variation_max_sale_price) / $variation_max_regular_price) * 100);
@@ -1161,8 +1192,8 @@ function wlb_display_order_data_in_admin($order)
         </h3>
         <div class="address">
             <?php
-            echo '<p><strong>' . __('Shipping Company') . ':</strong>' . get_post_meta($order->id, '_wlb_shipping_company', true) . '</p>';
-            echo '<p><strong>' . __('Tracking Code') . ':</strong>' . get_post_meta($order->id, '_wlb_tracking_code', true) . '</p>';
+            echo '<p><strong>' . __('Shipping Company') . ':</strong>' . get_post_meta($order->get_id(), '_wlb_shipping_company', true) . '</p>';
+            echo '<p><strong>' . __('Tracking Code') . ':</strong>' . get_post_meta($order->get_id(), '_wlb_tracking_code', true) . '</p>';
             ?>
         </div>
         <div class="edit_address">
@@ -1177,6 +1208,7 @@ function wlb_display_order_data_in_admin($order)
                         'gls' => __('GLS', 'woocommerce'),
                         'correos_express' => __('Correos Express', 'woocommerce'),
                         'ctt' => __('CTT', 'woocommerce'),
+                        'ups' => __('UPS', 'woocommerce'),
                     ),
                     'wrapper_class' => '_billing_company_field'
                 )
@@ -1194,3 +1226,77 @@ function wlb_save_extra_details($post_id, $post)
     update_post_meta($post_id, '_wlb_tracking_code', wc_clean($_POST['_wlb_tracking_code']));
 }
 add_action('woocommerce_before_save_order_items', 'wlb_save_extra_details', 45, 2);
+
+add_filter('woocommerce_product_query_meta_query', 'shop_only_instock_products', 10, 2);
+function shop_only_instock_products($meta_query, $query)
+{
+
+    // Only on shop archive pages
+    if (is_admin() || is_search() || !is_shop())
+        return $meta_query;
+    $meta_query[] = array(
+        'key' => '_stock_status',
+        'value' => 'outofstock',
+        'compare' => ' != '
+    );
+
+    return $meta_query;
+}
+
+add_filter('woocommerce_product_query_meta_query', 'filter_product_query_meta_query', 10, 2);
+function filter_product_query_meta_query($meta_query, $query)
+{
+
+    // On woocommerce home page only
+    if (is_front_page()) {
+
+        // Exclude products "out of stock"
+        $meta_query[] = array(
+            'key' => '_stock_status',
+            'value' => 'outofstock',
+            'compare' => '!=',
+        );
+
+    }
+    return $meta_query;
+}
+
+add_filter('woocommerce_product_backorders_allowed', '__return_false', 1000);
+add_filter('woocommerce_product_backorders_require_notification', '__return_false', 1000);
+
+add_filter('woocommerce_product_get_backorders', 'get_backorders_return_no');
+add_filter('woocommerce_product_variation_get_backorders', 'get_backorders_return_no');
+function get_backorders_return_no($backorders)
+{
+    return 'no';
+}
+
+add_filter('woocommerce_product_get_stock_status', 'filter_product_stock_status', 10, 2);
+add_filter('woocommerce_product_variation_get_stock_status', 'filter_product_stock_status', 10, 2);
+function filter_product_stock_status($stock_status, $product)
+{
+    return $product->get_manage_stock() && $product->get_stock_quantity() <= 0 ? 'outofstock' : $stock_status;
+}
+
+add_action('admin_footer', 'disable_backorder_option_from_product_settings');
+function disable_backorder_option_from_product_settings()
+{
+    global $pagenow, $post_type;
+
+    if (in_array($pagenow, array('post-new.php', 'post.php')) && $post_type === 'product'):
+        ?>
+        <script>
+            jQuery(function ($) {
+                // For product variations
+                $('#variable_product_options').on('change', function () {
+                    $('select[name^=variable_backorders]').each(function () {
+                        $(this).val('no');
+                    });
+                });
+                // For all other product types
+                $('select#_backorders').val('no');
+            });
+        </script>
+        <?php
+    endif;
+}

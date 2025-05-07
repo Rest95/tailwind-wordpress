@@ -19,8 +19,8 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-$tracking_code = get_post_meta($order->id, '_wlb_tracking_code', true);
-$shipping_company = get_post_meta($order->id, '_wlb_shipping_company', true);
+$tracking_code = get_post_meta($order->get_id(), '_wlb_tracking_code', true);
+$shipping_company = get_post_meta($order->get_id(), '_wlb_shipping_company', true);
 
 /*
  * @hooked WC_Emails::email_header() Output the email header
@@ -35,26 +35,27 @@ do_action('woocommerce_email_header', $email_heading, $email); ?>
 	<?php esc_html_e('We have finished processing your order.', 'woocommerce'); ?>
 </p>
 
-<?php
-if ($tracking_code) { ?>
+<?php if ($tracking_code): ?>
 	<p style="text-align:center">
 		Siga a sua encomenda.
 	</p>
 	<p style="text-align:center; padding-bottom:1rem;">
 		O seu código de rastreio<br />
-		<?php if ($shipping_company === 'gls') {
+		<?php if ($shipping_company === 'gls'):
 			echo 'GLS';
-		} else if ($shipping_company === 'correos_express') {
+		elseif ($shipping_company === 'correos_express'):
 			echo 'Correos Express';
-		} else if ($shipping_company === 'ctt') {
+		elseif ($shipping_company === 'ctt'):
 			echo 'CTT';
-		} ?>
+		elseif ($shipping_company === 'ups'):
+			echo 'UPS';
+		endif; ?>
 		<br />
 		<b>
 			<?= $tracking_code ?>
 		</b>
 	</p>
-	<?php if ($shipping_company === 'ctt') { ?>
+	<?php if ($shipping_company === 'ctt'): ?>
 		<div style="text-align:center; padding-bottom:2rem;">
 			<a href="https://appserver.ctt.pt/CustomerArea/PublicArea_Detail?IsFromPublicArea=true&ObjectCodeInput=<?= $tracking_code ?>&SearchInput=<?= $tracking_code ?>"
 				target="_blank" style="
@@ -74,9 +75,28 @@ if ($tracking_code) { ?>
 				Seguir Encomenda
 			</a>
 		</div>
-	<?php } ?>
-<?
-}
+	<?php endif;
+	if ($shipping_company === 'ups'): ?>
+		<div style="text-align:center; padding-bottom:2rem;">
+			<a href="https://www.ups.com/track?loc=pt_PT&requester=ST&trackingNumber=<?= $tracking_code ?>" target="_blank" style="
+														text-decoration: none;
+														padding: 12px 45px;
+														width: 210px;
+														height: 48px;
+														border: none;
+														border-radius: 0px;
+														background-color: #000;
+														border: 1px solid #000;
+														font-weight: 500;
+														color: #fff;
+														font-family: 'Inter', Arial,
+															sans-serif;
+																							">
+				Seguir Encomenda
+			</a>
+		</div>
+	<?php endif;
+endif;
 
 
 /*

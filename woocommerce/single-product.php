@@ -15,14 +15,14 @@
  * @version 1.6.4
  */
 
-if (! defined('ABSPATH') ) {
+if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
 get_header('shop'); ?>
 
 <div class="w-full">
-    <?php if (!is_front_page()) : ?>
+    <?php if (!is_front_page()): ?>
         <section class="px-4 md:px-6 font-roboto text-sm my-4 md:my-8">
             <div class="border-t border-b border-gray-400 py-2 text-gray-400">
                 <?php echo do_shortcode(' [wpseo_breadcrumb] '); ?>
@@ -39,12 +39,12 @@ get_header('shop'); ?>
     // do_action( 'woocommerce_before_main_content' );
     ?>
 
-        <?php while ( have_posts() ) : ?>
-            <?php the_post(); ?>
+    <?php while (have_posts()): ?>
+        <?php the_post(); ?>
 
-            <?php wc_get_template_part('content', 'single-product'); ?>
+        <?php wc_get_template_part('content', 'single-product'); ?>
 
-        <?php endwhile; // end of the loop. ?>
+    <?php endwhile; // end of the loop. ?>
 
     <?php
     /**

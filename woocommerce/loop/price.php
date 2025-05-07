@@ -22,7 +22,7 @@ if (!defined('ABSPATH')) {
 global $product;
 $percentage = 0;
 if ($product->is_type('simple')) { //if simple product
-    if ($product->sale_price) {
+    if ($product->sale_price && $product->is_on_sale()) {
         $percentage = round(((floatval($product->regular_price) - floatval($product->sale_price)) / floatval($product->regular_price)) * 100);
     }
 } else { //if variable product
@@ -30,17 +30,17 @@ if ($product->is_type('simple')) { //if simple product
 }
 ?>
 
-<?php if ($price_html = $product->get_price_html()) : ?>
-    <div class="flex justify-center items-center space-x-2">
-        <span class="loop-price text-base uppercase text-center">
-    <?php echo $price_html; ?>
+<?php if ($price_html = $product->get_price_html()): ?>
+    <div class="flex justify-start items-center space-x-2 ">
+        <span class="loop-price text-base uppercase text-left">
+            <?php echo $price_html; ?>
         </span>
-    <?php if ($percentage && $percentage > 0) { ?>
+        <?php if ($percentage && $percentage > 0) { ?>
             <div>
                 <span class="bg-amarelo text-white rounded-sm text-sm px-1 py-px sm:px-2 sm:py-1 font-roboto">
-        <?php echo '-' . $percentage ?>%
+                    <?php echo '-' . $percentage ?>%
                 </span>
             </div>
-    <?php } ?>
+        <?php } ?>
     </div>
 <?php endif; ?>
